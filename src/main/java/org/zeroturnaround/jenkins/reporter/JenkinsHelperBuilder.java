@@ -11,7 +11,7 @@ import javax.xml.xpath.XPathFactory;
 import org.xml.sax.SAXException;
 
 public class JenkinsHelperBuilder {
-  public JenkinsHelper createDefault() {
+  public JenkinsViewAnalyser createDefault() {
     final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     SAXParser saxParser;
     try {
@@ -36,7 +36,7 @@ public class JenkinsHelperBuilder {
     final XPathFactory xPathfactory = XPathFactory.newInstance();
     XPath xpath = xPathfactory.newXPath();
 
-    JenkinsHelper helper = new JenkinsHelper(builder, xpath, saxParser);
+    JenkinsViewAnalyser helper = new JenkinsViewAnalyser(builder, xpath, saxParser);
     return helper;
   }
 }

@@ -31,13 +31,13 @@ import org.zeroturnaround.jenkins.reporter.model.JenkinsView;
 import org.zeroturnaround.jenkins.reporter.model.Job;
 import org.zeroturnaround.jenkins.reporter.model.TestReport;
 
-public class JenkinsHelper {
-  private static final Logger log = LoggerFactory.getLogger(JenkinsHelper.class); // NOSONAR
+public class JenkinsViewAnalyser {
+  private static final Logger log = LoggerFactory.getLogger(JenkinsViewAnalyser.class); // NOSONAR
   private DocumentBuilder builder;
   private final XPath xpath;
   private final SAXParser saxParser;
 
-  public JenkinsHelper(DocumentBuilder builder, XPath xpath, SAXParser saxParser) {
+  public JenkinsViewAnalyser(DocumentBuilder builder, XPath xpath, SAXParser saxParser) {
     this.builder = builder;
     this.xpath = xpath;
     this.saxParser = saxParser;

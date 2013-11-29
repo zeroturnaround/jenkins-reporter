@@ -16,11 +16,11 @@ import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
  * Main entry point
  */
 public class Main {
-  private static final String VIEW_URL_PATTERN_PROPERTY = "jenkins.pattern";
+  private static final Logger log = LoggerFactory.getLogger(Main.class); // NOSONAR
 
+  private static final String VIEW_URL_PATTERN_PROPERTY = "jenkins.pattern";
   private static final String JENKINS_URL_PROPERTY = "jenkins.url";
 
-  private static final Logger log = LoggerFactory.getLogger(Main.class); // NOSONAR
 
   /**
    * The HTTP url of your Jenkins instances. For example http://jenkins/
@@ -69,7 +69,7 @@ public class Main {
       final PrintWriter out = new PrintWriter(new FileWriter(outputFile));
 
       // ViewData viewData =
-      JenkinsHelper jHelper = (new JenkinsHelperBuilder()).createDefault();
+      JenkinsViewAnalyser jHelper = (new JenkinsHelperBuilder()).createDefault();
       JenkinsView viewData = jHelper.getViewData(viewUrl);
 
       final JenkinsReportGenerator app = (new JenkinsReportGeneratorBuilder()).buildDefaultGenerator();
