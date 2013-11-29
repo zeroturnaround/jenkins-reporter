@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.zeroturnaround.liverebel;
+package org.zeroturnaround.jenkins.reporter;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;

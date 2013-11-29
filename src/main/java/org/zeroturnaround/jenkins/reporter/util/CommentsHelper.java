@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.zeroturnaround.jenkins.util;
+package org.zeroturnaround.jenkins.reporter.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +23,9 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.zeroturnaround.jenkins.reporter.model.TestCase;
 
 import com.google.common.base.Splitter;
-import com.zeroturnaround.jenkins.model.TestCase;
 
 /**
  * Helper class to add comments (from file loaded using {@link #load(File)}) to generated test report

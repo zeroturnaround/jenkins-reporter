@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.zeroturnaround.liverebel;
+package org.zeroturnaround.jenkins.reporter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -49,9 +49,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
-import com.zeroturnaround.jenkins.model.Job;
-import com.zeroturnaround.jenkins.model.View;
+import org.zeroturnaround.jenkins.reporter.model.Job;
+import org.zeroturnaround.jenkins.reporter.model.View;
 
 public class DiffConfigurations {
   public static class DiffReport {

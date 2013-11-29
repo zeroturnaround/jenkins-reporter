@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.zeroturnaround.liverebel;
+package org.zeroturnaround.jenkins.reporter;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -65,13 +65,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import com.zeroturnaround.jenkins.model.Build;
-import com.zeroturnaround.jenkins.model.Job;
-import com.zeroturnaround.jenkins.model.TestReport;
-import com.zeroturnaround.jenkins.model.View;
-import com.zeroturnaround.jenkins.util.CommentsHelper;
-import com.zeroturnaround.jenkins.util.URLParamEncoder;
+import org.zeroturnaround.jenkins.reporter.model.Build;
+import org.zeroturnaround.jenkins.reporter.model.Job;
+import org.zeroturnaround.jenkins.reporter.model.TestReport;
+import org.zeroturnaround.jenkins.reporter.model.View;
+import org.zeroturnaround.jenkins.reporter.util.CommentsHelper;
+import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
 
 public class JenkinsReporter {
   private static final Logger log = org.slf4j.LoggerFactory.getLogger(JenkinsReporter.class); //NOSONAR

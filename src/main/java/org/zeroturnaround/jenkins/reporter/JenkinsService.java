@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.zeroturnaround.liverebel;
+package org.zeroturnaround.jenkins.reporter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -46,11 +46,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import com.zeroturnaround.jenkins.model.Job;
-import com.zeroturnaround.jenkins.model.View;
-import com.zeroturnaround.jenkins.util.URLParamEncoder;
-import com.zeroturnaround.jenkins.util.XMLResponseHandler;
+import org.zeroturnaround.jenkins.reporter.model.Job;
+import org.zeroturnaround.jenkins.reporter.model.View;
+import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
+import org.zeroturnaround.jenkins.reporter.util.XMLResponseHandler;
 
 public class JenkinsService {
   private static final Logger log = LoggerFactory.getLogger(JenkinsService.class); //NOSONAR

@@ -1,11 +1,10 @@
-package com.zeroturnaround.liverebel;
+package org.zeroturnaround.jenkins.reporter;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import com.zeroturnaround.jenkins.model.TestCase;
-import com.zeroturnaround.jenkins.model.TestReport;
+import org.zeroturnaround.jenkins.reporter.model.TestCase;
+import org.zeroturnaround.jenkins.reporter.model.TestReport;
 
 final class ReadTestReportHandler extends DefaultHandler {
   private final TestReport testReport;

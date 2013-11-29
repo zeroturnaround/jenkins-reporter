@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.zeroturnaround.jenkins.model;
+package org.zeroturnaround.jenkins.reporter.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -21,10 +21,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.zeroturnaround.jenkins.reporter.model.Job.BadJobPredicate;
+import org.zeroturnaround.jenkins.reporter.model.Job.GoodJobPredicate;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.zeroturnaround.jenkins.model.Job.BadJobPredicate;
-import com.zeroturnaround.jenkins.model.Job.GoodJobPredicate;
 
 public class View {
   private int failCount;
