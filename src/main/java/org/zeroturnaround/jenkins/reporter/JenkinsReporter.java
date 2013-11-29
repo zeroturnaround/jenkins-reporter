@@ -17,16 +17,13 @@ package org.zeroturnaround.jenkins.reporter;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -70,61 +67,18 @@ import org.zeroturnaround.jenkins.reporter.model.Job;
 import org.zeroturnaround.jenkins.reporter.model.TestReport;
 import org.zeroturnaround.jenkins.reporter.model.View;
 import org.zeroturnaround.jenkins.reporter.util.CommentsHelper;
-import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
 
 /**
  * Main entry point
  */
 public class JenkinsReporter {
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(JenkinsReporter.class); // NOSONAR
+  private static final Logger log = LoggerFactory.getLogger(JenkinsReporter.class); // NOSONAR
 
-  private static final String JENKINS_URL = getProperty("jenkins.url", null);
-
-  private static final String JENKINS_VIEW_URL_PATTERN_PROPERTY = "jenkins.view.url.pattern";
-  private static final String OUTPUT_FILE_PROPERTY = "output.file";
-
-  private static final String JOB_NAME_PREFIX = System.getProperty("jobName.prefix");
-
-  public static final void main(String[] args) throws Exception {
-    if (args.length == 0) {
-      System.err.println("Please give the name of Jenkins view as parameter to this script.");
-      System.exit(-1);
-    }
-    
-    final SimpleDateFormat sdf = new SimpleDateFormat("'jenkins-report-'yyyy-MM-dd_HH.mm.ss");
-    String jenkinsUrl = JENKINS_URL;
-    if (!JENKINS_URL.endsWith("/"))
-      jenkinsUrl = JENKINS_URL + "/";
-    String jenkinsViewUrlPattern = getProperty(JENKINS_VIEW_URL_PATTERN_PROPERTY, "%sview/LiveRebel/view/%s");
-    String outputFilename = getProperty(OUTPUT_FILE_PROPERTY, null);
-    for (final String jenkinsViewName : args) {
-      final URI viewUrl = new URI(String.format(jenkinsViewUrlPattern, jenkinsUrl, URLParamEncoder.encode(jenkinsViewName)));
-      if (outputFilename != null) {
-        log.info("using view URL {} and generating output to {}", viewUrl, outputFilename);
-      }
-
-      final JenkinsReporter app = new JenkinsReporter();
-
-      if (Desktop.isDesktopSupported()) {
-        if (outputFilename == null)
-          outputFilename = jenkinsViewName + "-" + sdf.format(new Date()) + "-";
-        final File outputFile = File.createTempFile(outputFilename, ".html");
-        final PrintWriter out = new PrintWriter(new FileWriter(outputFile));
-
-        app.generateReport(viewUrl, out);
-        log.info("Generated report to: " + outputFile);
-
-        Desktop.getDesktop().browse(outputFile.toURI());
-      }
-      else {
-        final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(ch.qos.logback.classic.Level.OFF);
-
-        final PrintWriter out = outputFilename != null ? new PrintWriter(outputFilename, "UTF-8") : new PrintWriter(System.out);
-        app.generateReport(viewUrl, out);
-      }
-    }
-  }
+  private final DocumentBuilder builder;
+  private final SAXParser saxParser;
+  private final Template template;
+  private View view;
+  private final XPath xpath;
 
   // more relaxed file format - only "=" sign should be escaped in the key
   // with "\"
@@ -133,19 +87,6 @@ public class JenkinsReporter {
     final File file = new File(failureCommentsDir, "failureComments-" + jenkinsViewName + ".properties");
     return new CommentsHelper().load(file);
   }
-
-  private static String getProperty(String propName, String defaultValue) {
-    String value = System.getProperty(propName);
-    if (value == null)
-      return defaultValue;
-    return value;
-  }
-
-  private final DocumentBuilder builder;
-  private final SAXParser saxParser;
-  private final Template template;
-  private View view;
-  private final XPath xpath;
 
   public JenkinsReporter() throws ParserConfigurationException, SAXException {
     final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
@@ -216,7 +157,7 @@ public class JenkinsReporter {
     out.close();
   }
 
-  private void generateReport(URI viewUrl, PrintWriter out) throws XPathExpressionException, URISyntaxException, SAXException, IOException,
+  public void generateReport(URI viewUrl, PrintWriter out) throws XPathExpressionException, URISyntaxException, SAXException, IOException,
       ParserConfigurationException {
     read(viewUrl);
 
@@ -264,7 +205,7 @@ public class JenkinsReporter {
         final Element el = (Element) node;
         final String name = el.getElementsByTagName("name").item(0).getTextContent();
 
-        if (filterByPrefix && JOB_NAME_PREFIX != null && !name.startsWith(JOB_NAME_PREFIX)) {
+        if (filterByPrefix && Main.JOB_NAME_PREFIX != null && !name.startsWith(Main.JOB_NAME_PREFIX)) {
           continue;
         }
 
