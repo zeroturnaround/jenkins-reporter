@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.zeroturnaround.jenkins.reporter.ProcessingException;
 import org.zeroturnaround.jenkins.reporter.model.TestCase;
 
 import com.google.common.base.Splitter;
@@ -67,9 +68,15 @@ public class CommentsHelper {
     return sb.toString();
   }
 
-  public CommentsHelper load(File file) throws IOException {
+  public CommentsHelper load(File file) {
     if (file.isFile()) {
-      List<String> fileLines = FileUtils.readLines(file);
+      List<String> fileLines;
+      try {
+        fileLines = FileUtils.readLines(file);
+      }
+      catch (IOException e) {
+        throw new ProcessingException(e);
+      }
       for (String line : fileLines) {
         line = line.trim();
         if (line.startsWith("#") || line.isEmpty()) {

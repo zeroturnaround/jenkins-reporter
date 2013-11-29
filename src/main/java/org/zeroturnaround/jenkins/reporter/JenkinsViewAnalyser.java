@@ -36,6 +36,10 @@ public class JenkinsViewAnalyser {
   private DocumentBuilder builder;
   private final XPath xpath;
   private final SAXParser saxParser;
+  
+  private static final int SECONDS_IN_MINUTE = 60;
+  private static final int SECONDS_IN_HOUR= SECONDS_IN_MINUTE*60;
+  private static final int MILLISECONDS_IN_SECOND = 1000;
 
   public JenkinsViewAnalyser(DocumentBuilder builder, XPath xpath, SAXParser saxParser) {
     this.builder = builder;
@@ -229,8 +233,8 @@ public class JenkinsViewAnalyser {
     // FIXME this will cause confusion in the beginning of Jan
     build.setDayOfYear(cal.get(Calendar.DAY_OF_YEAR));
 
-    final long durationSeconds = Long.parseLong(doc.getElementsByTagName("duration").item(0).getTextContent()) / 1000;
-    build.setDuration(String.format("%d:%02d:%02d", durationSeconds / 3600, durationSeconds % 3600 / 60, durationSeconds % 60));
+    final long durationSeconds = Long.parseLong(doc.getElementsByTagName("duration").item(0).getTextContent()) / MILLISECONDS_IN_SECOND;
+    build.setDuration(String.format("%d:%02d:%02d", durationSeconds / SECONDS_IN_HOUR, durationSeconds % SECONDS_IN_HOUR / SECONDS_IN_MINUTE, durationSeconds % SECONDS_IN_MINUTE));
 
     return build;
   }
@@ -244,7 +248,8 @@ public class JenkinsViewAnalyser {
     try {
       saxParser.parse(buildUrl + "testReport/api/xml", handler);
     }
-    catch (final FileNotFoundException _ignore) {
+    catch (FileNotFoundException e) {
+      throw new ProcessingException(e);
     }
 
     return testReport;

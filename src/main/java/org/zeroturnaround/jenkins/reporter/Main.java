@@ -2,8 +2,10 @@ package org.zeroturnaround.jenkins.reporter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -37,7 +39,7 @@ public class Main {
 
   public static final String JOB_NAME_PREFIX = System.getProperty("jobName.prefix");
 
-  public static final void main(String[] args) throws Exception {
+  public static final void main(String[] args) {
     if (args.length == 0) {
       System.err.println("Please give the name of Jenkins view as parameter to this script."); // NOSONAR
       System.exit(-1);
@@ -54,7 +56,13 @@ public class Main {
 
     // Lets generate a report for all the view specified
     for (final String jenkinsViewName : args) {
-      final URI viewUrl = new URI(String.format(VIEW_URL_PATTERN, jenkinsUrl, URLParamEncoder.encode(jenkinsViewName)));
+      URI viewUrl;
+      try {
+        viewUrl = new URI(String.format(VIEW_URL_PATTERN, jenkinsUrl, URLParamEncoder.encode(jenkinsViewName)));
+      }
+      catch (URISyntaxException e) {
+        throw new ProcessingException(e);
+      }
 
       // lets generate a output filename if none provided
       String outputFileName = OUTPUT_FILE_NAME;
@@ -64,8 +72,15 @@ public class Main {
       }
       log.debug("Using view URL {} and generating output to {}", viewUrl, outputFileName);
 
-      final File outputFile = File.createTempFile(outputFileName, ".html");
-      final PrintWriter out = new PrintWriter(new FileWriter(outputFile));
+      File outputFile;
+      PrintWriter out;
+      try {
+        outputFile = File.createTempFile(outputFileName, ".html");
+        out = new PrintWriter(new FileWriter(outputFile));
+      }
+      catch (IOException e) {
+        throw new ProcessingException(e);
+      }
 
       // ViewData viewData =
       JenkinsViewAnalyser jHelper = (new JenkinsHelperBuilder()).createDefault();

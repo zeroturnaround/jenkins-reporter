@@ -43,7 +43,7 @@ public class JenkinsReportGenerator {
     this.template = template;
   }
 
-  public void generateReport(JenkinsView viewData, PrintWriter out) throws IOException {
+  public void generateReport(JenkinsView viewData, PrintWriter out) {
     final List<Job> failedJobs = newArrayList();
     failedJobs.addAll(viewData.getFailedJobs());
 
@@ -87,7 +87,7 @@ public class JenkinsReportGenerator {
 
   // more relaxed file format - only "=" sign should be escaped in the key
   // with "\"
-  private static CommentsHelper createCommentsHelper(final String jenkinsViewName) throws IOException {
+  private static CommentsHelper createCommentsHelper(final String jenkinsViewName) {
     final String failureCommentsDir = "src/main/resources";
     final File file = new File(failureCommentsDir, "failureComments-" + jenkinsViewName + ".properties");
     return new CommentsHelper().load(file);

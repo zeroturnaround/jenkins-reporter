@@ -31,7 +31,7 @@ public class JenkinsHelperBuilder {
       builder = factory.newDocumentBuilder();
     }
     catch (ParserConfigurationException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     final XPathFactory xPathfactory = XPathFactory.newInstance();
     XPath xpath = xPathfactory.newXPath();
