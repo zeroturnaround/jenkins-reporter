@@ -6,7 +6,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.zeroturnaround.jenkins.reporter.model.TestCase;
 import org.zeroturnaround.jenkins.reporter.model.TestReport;
 
-final class ReadTestReportHandler extends DefaultHandler {
+public final class ReadTestReportHandler extends DefaultHandler {
   private final TestReport testReport;
   private boolean ageNode = false;
   private boolean classNameNode = false;

@@ -72,51 +72,32 @@ import org.zeroturnaround.jenkins.reporter.model.View;
 import org.zeroturnaround.jenkins.reporter.util.CommentsHelper;
 import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
 
+/**
+ * Main entry point
+ */
 public class JenkinsReporter {
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(JenkinsReporter.class); //NOSONAR
+  private static final Logger log = org.slf4j.LoggerFactory.getLogger(JenkinsReporter.class); // NOSONAR
 
-  private static final String JENKINS_URL_PROPERTY = "jenkins.url";
+  private static final String JENKINS_URL = getProperty("jenkins.url", null);
+
   private static final String JENKINS_VIEW_URL_PATTERN_PROPERTY = "jenkins.view.url.pattern";
   private static final String OUTPUT_FILE_PROPERTY = "output.file";
 
   private static final String JOB_NAME_PREFIX = System.getProperty("jobName.prefix");
 
-  // more relaxed file format - only "=" sign should be escaped in the key
-  // with "\"
-  private static CommentsHelper createCommentsHelper(final String jenkinsViewName) throws IOException {
-    final String failureCommentsDir = "src/main/resources";
-    final File file = new File(failureCommentsDir, "failureComments-" + jenkinsViewName + ".properties");
-    return new CommentsHelper().load(file);
-  }
-
   public static final void main(String[] args) throws Exception {
     if (args.length == 0) {
-      System.err.println("Please provide command.");
-      System.exit(-1);
-    }
-
-    if (args[0].equals("diff")) {
-      DiffConfigurations.diffConfigurations(args);
-    }
-    else {
-      generateTestReport(args);
-    }
-  }
-
-  public static final void generateTestReport(String jenkinsViewNames[]) throws URISyntaxException, IOException, ParserConfigurationException, SAXException,
-      XPathExpressionException {
-    if (jenkinsViewNames.length == 0) {
       System.err.println("Please give the name of Jenkins view as parameter to this script.");
       System.exit(-1);
     }
-
+    
     final SimpleDateFormat sdf = new SimpleDateFormat("'jenkins-report-'yyyy-MM-dd_HH.mm.ss");
-    String jenkinsUrl = getProperty(JENKINS_URL_PROPERTY, "http://jenkins/jenkins/");
-    if (!jenkinsUrl.endsWith("/"))
-      jenkinsUrl = jenkinsUrl + "/";
+    String jenkinsUrl = JENKINS_URL;
+    if (!JENKINS_URL.endsWith("/"))
+      jenkinsUrl = JENKINS_URL + "/";
     String jenkinsViewUrlPattern = getProperty(JENKINS_VIEW_URL_PATTERN_PROPERTY, "%sview/LiveRebel/view/%s");
     String outputFilename = getProperty(OUTPUT_FILE_PROPERTY, null);
-    for (final String jenkinsViewName : jenkinsViewNames) {
+    for (final String jenkinsViewName : args) {
       final URI viewUrl = new URI(String.format(jenkinsViewUrlPattern, jenkinsUrl, URLParamEncoder.encode(jenkinsViewName)));
       if (outputFilename != null) {
         log.info("using view URL {} and generating output to {}", viewUrl, outputFilename);
@@ -143,6 +124,14 @@ public class JenkinsReporter {
         app.generateReport(viewUrl, out);
       }
     }
+  }
+
+  // more relaxed file format - only "=" sign should be escaped in the key
+  // with "\"
+  private static CommentsHelper createCommentsHelper(final String jenkinsViewName) throws IOException {
+    final String failureCommentsDir = "src/main/resources";
+    final File file = new File(failureCommentsDir, "failureComments-" + jenkinsViewName + ".properties");
+    return new CommentsHelper().load(file);
   }
 
   private static String getProperty(String propName, String defaultValue) {
