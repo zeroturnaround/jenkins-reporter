@@ -9,21 +9,21 @@ import com.zeroturnaround.jenkins.model.TestReport;
 
 final class ReadTestReportHandler extends DefaultHandler {
   private final TestReport testReport;
-  boolean ageNode = false;
-  boolean classNameNode = false;
-  StringBuffer errorDetails, errorStackTrace;
-  boolean errorDetailsNode = false;
-  boolean errorStackTraceNode = false;
-  boolean failCountNode = false;
+  private boolean ageNode = false;
+  private boolean classNameNode = false;
+  private StringBuffer errorDetails, errorStackTrace;
+  private boolean errorDetailsNode = false;
+  private boolean errorStackTraceNode = false;
+  private boolean failCountNode = false;
   private boolean matrixJob;
-  boolean methodNameNode = false;
-  boolean passCountNode = false;
+  private boolean methodNameNode = false;
+  private boolean passCountNode = false;
   private boolean plainJob;
-  boolean rootNode = false;
-  boolean skipCountNode = false;
-  boolean statusNode = false;
-  TestCase testCase;
-  boolean totalCountNode = false;
+  private boolean rootNode = false;
+  private boolean skipCountNode = false;
+  private boolean statusNode = false;
+  private TestCase testCase;
+  private boolean totalCountNode = false;
 
   ReadTestReportHandler(TestReport testReport) {
     this.testReport = testReport;

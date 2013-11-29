@@ -124,9 +124,9 @@ public class DiffConfigurations {
 
   public static void diffConfigurations(String[] args) throws Exception {
     if (args.length != 3) {
-      System.out.println("Diff usage:");
-      System.out.println("java -jar jenkins-reporter-standalone.jar diff %username% %authtoken%");
-      System.exit(-1);
+      System.out.println("Diff usage:"); //NOSONAR
+      System.out.println("java -jar jenkins-reporter-standalone.jar diff %username% %authtoken%"); //NOSONAR
+      System.exit(-1); //NOSONAR
     }
 
     JenkinsService service = new JenkinsService(args[1], args[2]);

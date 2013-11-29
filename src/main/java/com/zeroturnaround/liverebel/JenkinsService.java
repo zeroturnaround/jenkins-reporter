@@ -33,7 +33,6 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
@@ -68,7 +67,7 @@ public class JenkinsService {
   private XMLResponseHandler handler;
   private final XPath xpath;
 
-  HttpRequestInterceptor preemptiveAuth = new HttpRequestInterceptor() {
+  private HttpRequestInterceptor preemptiveAuth = new HttpRequestInterceptor() {
     public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
       AuthState authState = (AuthState) context.getAttribute(ClientContext.TARGET_AUTH_STATE);
       CredentialsProvider credsProvider = (CredentialsProvider) context.getAttribute(ClientContext.CREDS_PROVIDER);
