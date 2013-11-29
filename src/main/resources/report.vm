@@ -1,0 +1,343 @@
+<html>
+<head>
+<script>
+	function toggleVisibility(id) {
+		var e = document.getElementById(id);
+	
+		if(e.style.display == 'block')
+			e.style.display = 'none';
+		else
+			e.style.display = 'block';
+	}
+	
+	function expandButton(buttonEl) {
+		if (buttonEl) buttonEl.className = "job-row-toggle-icon expanded-icon";
+	}
+	
+	function collapseButton(buttonEl) {
+		if (buttonEl) buttonEl.className = "job-row-toggle-icon collapsed-icon";
+	}
+	
+	function toggleButton(buttonEl) {
+		if(buttonEl.className.indexOf("expanded-icon") != -1) {
+			collapseButton(buttonEl);
+		}
+		else {
+			expandButton(buttonEl);
+		}	
+	}
+	
+	function expandTestResults(nodeList) {
+		if (nodeList)
+			for (var i = 0, length = nodeList.length; i < length; i++) {
+				nodeList[i].style.display = 'block';
+			}
+	}
+	
+	function collapseTestResults(nodeList) {
+		if (nodeList)
+			for (var i = 0, length = nodeList.length; i < length; i++) {
+				nodeList[i].style.display = 'none';
+			}
+	}
+	
+	function toggleTestResults(nodeList) {
+		for (var i = 0, length = nodeList.length; i < length; i++) {
+			if(nodeList[i].style.display == 'block')
+				nodeList[i].style.display = 'none';
+			else
+				nodeList[i].style.display = 'block';
+		}
+	}
+	
+	function toggleVisibilityOfTestResults(jobId) {
+		// toggle button
+		var buttonEl = document.getElementById("job_" + jobId + "_toggleButton");
+		toggleButton(buttonEl);
+			
+		// toggle test results
+		var nodeList = document.querySelectorAll(".job_" + jobId + "_testResults");
+		toggleTestResults(nodeList);
+	}
+	
+	function toggleVisibilityOfChildTestResults(jobId) {
+		// toggle button
+		var buttonEl = document.getElementById("childJob_" + jobId + "_toggleButton");
+		toggleButton(buttonEl);
+			
+		// toggle test results
+		var nodeList = document.querySelectorAll(".childJob_" + jobId + "_testResults");
+		toggleTestResults(nodeList);
+	}
+	
+	function expandAll() {
+		for (i = 0; i < jobIds.length; i++) {
+			var buttonEl = document.getElementById("job_" + jobIds[i] + "_toggleButton");
+			expandButton(buttonEl);
+			
+			var nodeList = document.querySelectorAll(".job_" + jobIds[i] + "_testResults");
+			expandTestResults(nodeList);
+		}
+		
+		for (i = 0; i < childJobIds.length; i++) {
+			var buttonEl = document.getElementById("childJob_" + childJobIds[i] + "_toggleButton");
+			expandButton(buttonEl);
+			
+			var nodeList = document.querySelectorAll(".childJob_" + childJobIds[i] + "_testResults");
+			expandTestResults(nodeList);
+		}
+	}
+	
+	function collapseAll() {
+		for (i = 0; i < jobIds.length; i++) {
+			var buttonEl = document.getElementById("job_" + jobIds[i] + "_toggleButton");
+			collapseButton(buttonEl);
+			
+			var nodeList = document.querySelectorAll(".job_" + jobIds[i] + "_testResults");
+			collapseTestResults(nodeList);
+		}
+		
+		for (i = 0; i < childJobIds.length; i++) {
+			var buttonEl = document.getElementById("childJob_" + childJobIds[i] + "_toggleButton");
+			collapseButton(buttonEl);
+			
+			var nodeList = document.querySelectorAll(".childJob_" + childJobIds[i] + "_testResults");
+			collapseTestResults(nodeList);
+		}
+	}
+	
+	jobIds = [];
+	childJobIds = [];
+	#set ($childIndex = 0)
+	
+	#foreach ($job in $failedJobs)
+		jobIds[$foreach.index] = $job.id;
+		
+		#foreach ($childJob in $job.children)
+			childJobIds[$childIndex] = $childJob.id;
+			#set ($childIndex = $childIndex + 1)
+		#end
+	#end
+</script>
+<style>
+	.age {
+		font-weight: bold;
+	}
+	.age .regression {
+		color: red;
+	}
+	.age .failure {
+		color: gold;
+	}
+	.job-row-toggle-icon {
+		width: 9px;
+		height: 9px;
+		display: inline-block;
+	}
+	.clickable-icon {
+		cursor: hand;
+	}
+	.collapsed-icon {
+		background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAIdJREFUKFNj6Ovr+zF71qyAuXPmMM+ZM4cBHf///5+Bob6h4U9LS8vjGTNmrJ87d67J7NmzGZAxTNF/oMLfVTU1n9o7Oj5MnjRpFRDLATEDCCMrAimE4b9Q9lIgjVMRWHFNfe3Xqtqa1V1dXWogNyGbAmLDTFoIsoqgm5AV4fQdXBG+cIIpAgAmGLtTJcqUZQAAAABJRU5ErkJggg==') top left no-repeat;
+	}
+	.expanded-icon {
+		background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAJ1JREFUKFNj6Ovr+1Hf0PAHiP9jwX9A8gyzZ80KaGlpeQxU8BtN0W+QOEieYe6cOcwzZsxYX1VT8wlZEYgPEgfJM8yZM4dh7ty5Ju0dHR+QFYH4IHGQPFjR7NmzGSZPmrQKqOgvVOFfEB8kjq5IDtkkoCI5bIoYgIoW1tTXfgXSS4GKwDaATfr//z8KrqqtWQ1UBLIet6Kuri41dEUAvb+2OsURQWkAAAAASUVORK5CYII=') top left no-repeat;
+	}
+	
+	ul.childJob {
+		list-style-type: none;
+	}
+</style>
+</head>
+<body>
+<h1><a href="${view.url}">${view.name}</a></h1>
+
+#if($jobs.isEmpty())
+	<p>Congratulations, there are no failed tests!</p>
+#else
+	<p>My condolences, there are $failedJobs.size() failed jobs (of $view.jobsTotal total jobs) with $view.failCount failed tests (of $view.testsTotal total tests). Failure ratio $numberTool.format("#0.0'%'", $view.failureRate).</p>
+	
+	<p><small><a href="javascript:expandAll()">expand all</a> | <a href="javascript:collapseAll()">collapse all</a></small></p>
+	
+	#set ($i = 1)
+	#set($firstJobStartDayOfYear = -1)
+	
+	#foreach ($job in $failedJobs)
+		#if($firstJobStartDayOfYear == -1)
+			#set ($firstJobStartDayOfYear = $job.lastCompletedBuild.dayOfYear)
+		#{else}
+			#set ($currentJobStartDayOfYear = $job.lastCompletedBuild.dayOfYear)
+			#if($firstJobStartDayOfYear != $currentJobStartDayOfYear)
+			 #set ($firstJobStartDayOfYear = $currentJobStartDayOfYear)
+			 <hr>
+			#{end}
+		#{end}
+		#set ($hideTestReports = $job.lastCompletedBuild.testReport && $job.lastCompletedBuild.testReport.testCases.size() > 30)
+		#set ($noFailedTests = !$job.lastCompletedBuild.testReport || $job.lastCompletedBuild.testReport.failCount == 0)
+		#set ($allowToggle = $job.lastCompletedBuild.testReport && $job.lastCompletedBuild.testReport.failCount > 0)
+		#set ($collapsed = ($job.lastCompletedBuild.testReport && $job.lastCompletedBuild.testReport.failCount > 30) || $noFailedTests)
+		
+		<span id="job_${job.id}">
+			<p>
+				<span id="job_${job.id}_toggleButton" class="job-row-toggle-icon #if($allowToggle)clickable-icon#{end} #if($collapsed)collapsed-icon#{else}expanded-icon#{end}" #if($allowToggle)onclick="toggleVisibilityOfTestResults('${job.id}')"#{end}></span>
+				
+				<b>${job.lastCompletedBuild.result}</b> 
+				
+				<a href="${job.url}" target="_blank">${job.name}</a> 
+				(#<a href="${job.lastCompletedBuild.url}" target="_blank">${job.lastCompletedBuild.id}</a>
+				, <b>Started:</b> $dateTool.format('HH:mm dd.MM.yyyy', $job.lastCompletedBuild.timestamp), <b>Duration:</b> $job.lastCompletedBuild.duration)
+				
+				#if($job.lastCompletedBuild.testReport)
+					#if(!$noFailedTests)
+						, failed
+						<a href="${job.url}${job.lastCompletedBuild.id}/console" target="_blank">${job.lastCompletedBuild.testReport.failCount}</a>
+						tests of ${job.lastCompletedBuild.testReport.totalCount}.
+						Failure ratio $numberTool.format("#0.0'%'", $job.lastCompletedBuild.testReport.failureRate).
+						( <a href="${job.url}${job.lastCompletedBuild.id}/testReport" target="_blank">see the test report</a> ):
+					#{else}
+						, no tests failed.
+					#{end}
+				#{end}
+			</p>
+			
+			#if($job.matrix)
+				<ul class="childJob job_${job.id}_testResults">
+					#foreach ($childJob in $job.children)
+						#if($childJob.lastCompletedBuild.result == "FAILURE")
+							<li>
+								<span id="childJob_${childJob.id}_toggleButton" class="job-row-toggle-icon #if($allowToggle)clickable-icon expanded-icon#{else}collapsed-icon#{end}" #if($allowToggle)onclick="toggleVisibilityOfChildTestResults('${childJob.id}')"#{end}></span>
+								
+								<a href="${childJob.url}" target="_blank">${childJob.name}</a>
+								 
+								(#<a href="${childJob.lastCompletedBuild.url}" target="_blank">${childJob.lastCompletedBuild.id}</a>
+								, <b>Duration:</b> $childJob.lastCompletedBuild.duration)
+								
+								#if($childJob.lastCompletedBuild.testReport)
+									#if($childJob.lastCompletedBuild.testReport.failCount > 0)
+										, failed
+										<a href="${childJob.url}${childJob.lastCompletedBuild.id}/console" target="_blank">${childJob.lastCompletedBuild.testReport.failCount}</a>
+										tests of ${childJob.lastCompletedBuild.testReport.totalCount}.
+										Failure ratio $numberTool.format("#0.0'%'", $childJob.lastCompletedBuild.testReport.failureRate).
+										( <a href="${childJob.url}${childJob.lastCompletedBuild.id}/testReport" target="_blank">see the test report</a> ):
+									#{else}
+										, no tests failed.
+									#{end}
+								#{end}
+								
+								<ul class="testResults job_${job.id}_testResults childJob_${childJob.id}_testResults" style="display: #if($hideTestReports)none#{else}block#{end};">
+									#if($childJob.lastCompletedBuild.testReport)
+										#foreach ($testCase in $childJob.lastCompletedBuild.testReport.testCases)
+											#set ($comment = $commentsHelper.getComment($testCase))
+											#set ($showErrorDetails = $testCase.errorDetails || $testCase.errorStackTrace)
+											
+											<li>
+												#if($showErrorDetails)
+													<a href="javascript:toggleVisibility('errorDetails_$i')">${testCase.className}.${testCase.methodName}</a>
+													(<span class="age">Age: <span class="#if($testCase.age == 1)regression#{else}failure#end">${testCase.age}</span></span>)
+													
+													<div id="errorDetails_$i" class="errorDetails" style="display: none;">
+														#if($testCase.errorDetails)
+															<p>$escapeTool.html($testCase.errorDetails)</p>
+														#end
+														
+														#if($testCase.errorStackTrace)
+															<blockquote>
+																<pre>$escapeTool.html($testCase.errorStackTrace)</pre>
+															</blockquote>
+														#end
+													</div>
+												#else
+													${testCase.className}.${testCase.methodName} (<span class="age">Age: <span class="#if($testCase.age == 1)regression#{else}failure#end">${testCase.age}</span></span>)
+												#end
+												<!-- FIXME "NONE" is ugly workaround to avoid using old comment for each next testCase -->
+												#if($comment && $comment != "NONE")
+													Comment:
+													<span style="color: red">
+														$commentsHelper.wrapIssueNumberWithLink($comment)
+													</span>
+													#set ($comment = "NONE")
+												#end
+											</li>
+											
+											#set ($i = $i + 1)
+										#end
+									#else
+										<a href="${childJob.url}${childJob.lastCompletedBuild.id}/console">build failed</a>
+									#end
+								</ul>
+							</li>
+						#end
+					#end
+				</ul>
+			#{else}
+				<ul class="testResults job_${job.id}_testResults" style="display: #if($hideTestReports)none#{else}block#{end};">
+					#if($job.lastCompletedBuild.testReport)
+						#foreach ($testCase in $job.lastCompletedBuild.testReport.testCases)
+							#set ($comment = $commentsHelper.getComment($testCase))
+							#set ($showErrorDetails = $testCase.errorDetails || $testCase.errorStackTrace)
+							
+							<li>
+								#if($showErrorDetails)
+									<a href="javascript:toggleVisibility('errorDetails_$i')">${testCase.className}.${testCase.methodName}</a>
+									(<span class="age">Age: <span class="#if($testCase.age == 1)regression#{else}failure#end">${testCase.age}</span></span>)
+									
+									<div id="errorDetails_$i" class="errorDetails" style="display: none;">
+										#if($testCase.errorDetails)
+											<p>$escapeTool.html($testCase.errorDetails)</p>
+										#end
+										
+										#if($testCase.errorStackTrace)
+											<blockquote>
+												<pre>$escapeTool.html($testCase.errorStackTrace)</pre>
+											</blockquote>
+										#end
+									</div>
+								#else
+									${testCase.className}.${testCase.methodName} (<span class="age">Age: <span class="#if($testCase.age == 1)regression#{else}failure#end">${testCase.age}</span></span>)
+								#end
+								<!-- FIXME "NONE" is ugly workaround to avoid using old comment for each next testCase -->
+								#if($comment && $comment != "NONE")
+									Comment:
+									<span style="color: red">
+										$commentsHelper.wrapIssueNumberWithLink($comment)
+									</span>
+									#set ($comment = "NONE")
+								#end
+							</li>
+							
+							#set ($i = $i + 1)
+						#end
+					#else
+						<a href="${job.url}${job.lastCompletedBuild.id}/console">build failed</a>
+					#end
+				</ul>
+			#{end}
+		</span>
+	#end
+	
+	<h2>SUCCESS</h2>
+	#set($firstJobStartDayOfYear = -1)
+	
+	#foreach ($job in $passedJobs)
+	    #if($firstJobStartDayOfYear == -1)
+          #set ($firstJobStartDayOfYear = $job.lastCompletedBuild.dayOfYear)
+        #{else}
+          #set ($currentJobStartDayOfYear = $job.lastCompletedBuild.dayOfYear)
+          #if($firstJobStartDayOfYear != $currentJobStartDayOfYear)
+            #set ($firstJobStartDayOfYear = $currentJobStartDayOfYear)
+            <hr>
+          #{end}
+        #{end}
+		<p>
+			<a href="${job.url}" target="_blank">${job.name}</a> 
+			(#<a href="${job.lastCompletedBuild.url}" target="_blank">${job.lastCompletedBuild.id}</a>
+			, <b>Started:</b> $dateTool.format('HH:mm dd.MM.yyyy', $job.lastCompletedBuild.timestamp), <b>Duration:</b> $job.lastCompletedBuild.duration)
+			#if($job.lastCompletedBuild.testReport)
+				, passed ${job.lastCompletedBuild.testReport.totalCount} tests.
+			#end
+		</p>	
+	#end
+#end
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<html>
+<head>
+<style>
+.reason { background-color: #dddddd; }
+td {width: 48%; overflow: auto; }
+table {width: 100%; }
+</style>
+</head>
+<body>
+<h1>Configuration differences</h1>
+
+<table>
+  #foreach ($jobName in $unmappedA)
+    <tr>
+     <td width="50%">$jobName</td>
+     <td width="50%"></td>
+    </tr>
+  #end
+  #foreach ($jobName in $unmappedB)
+    <tr>
+     <td width="50%"></td>
+     <td width="50%">$jobName</td>
+    </tr>
+  #end
+</table>
+
+#foreach ($report in $reports)
+  <table>
+    <tr>
+      <th>$report.jobA.name</th>
+      <th>$report.jobB.name</th>
+    </tr>
+    #foreach ($reportItem in $report.items)
+      <tr>
+        <td class="reason" colspan="2">$reportItem.reason</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><pre>$reportItem.xmlA</pre></td>
+        <td><pre>$reportItem.xmlB</pre></td>
+      </tr>
+    #end
+  </table>
+#end
+</body>
+</html>

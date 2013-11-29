@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <id>standalone</id>
+  <baseDirectory>.</baseDirectory>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>META-INF/eclipse*</exclude>
+          <exclude>META-INF/ECLIPSE*</exclude>
+          <exclude>META-INF/MANIFEST.MF</exclude>
+          <exclude>META-INF/LICENSE*</exclude>
+          <exclude>META-INF/NOTICE*</exclude>
+          <exclude>META-INF/maven/**</exclude>
+          <exclude>about_files/**</exclude>
+          <exclude>about*</exclude>
+          <exclude>plugin.properties</exclude>
+          <exclude>*.txt</exclude>
+          <exclude>*.html</exclude>
+        </excludes>
+      </unpackOptions>
+    </dependencySet>
+  </dependencySets>
+</assembly>
