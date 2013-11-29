@@ -53,7 +53,7 @@ import com.zeroturnaround.jenkins.util.URLParamEncoder;
 import com.zeroturnaround.jenkins.util.XMLResponseHandler;
 
 public class JenkinsService {
-  private static final Logger log = LoggerFactory.getLogger(JenkinsService.class);
+  private static final Logger log = LoggerFactory.getLogger(JenkinsService.class); //NOSONAR
 
   private static final String JENKINS_URL_PROPERTY = "jenkins.url";
   private static final String JENKINS_VIEW_URL_PATTERN_PROPERTY = "jenkins.view.url.pattern";

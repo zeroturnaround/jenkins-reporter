@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -74,25 +75,13 @@ import com.zeroturnaround.jenkins.util.CommentsHelper;
 import com.zeroturnaround.jenkins.util.URLParamEncoder;
 
 public class JenkinsReporter {
+  private static final Logger log = org.slf4j.LoggerFactory.getLogger(JenkinsReporter.class); //NOSONAR
 
   private static final String JENKINS_URL_PROPERTY = "jenkins.url";
   private static final String JENKINS_VIEW_URL_PATTERN_PROPERTY = "jenkins.view.url.pattern";
   private static final String OUTPUT_FILE_PROPERTY = "output.file";
 
-  public static final class JobByTimestampComparator implements Comparator<Job> {
-    @Override
-    public int compare(Job job1, Job job2) {
-      if (job1.getLastCompletedBuild() != null && job2.getLastCompletedBuild() != null) {
-        return -1 * job1.getLastCompletedBuild().getTimestamp().compareTo(job2.getLastCompletedBuild().getTimestamp());
-      }
-      else {
-        return -1;
-      }
-    }
-  }
-
   private static final String JOB_NAME_PREFIX = System.getProperty("jobName.prefix");
-  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JenkinsReporter.class);
 
   // more relaxed file format - only "=" sign should be escaped in the key
   // with "\"
@@ -166,20 +155,17 @@ public class JenkinsReporter {
   }
 
   private final DocumentBuilder builder;
-  private final DocumentBuilderFactory factory;
-  private final SAXParserFactory saxFactory;
   private final SAXParser saxParser;
   private final Template template;
   private View view;
   private final XPath xpath;
-  private final XPathFactory xPathfactory;
 
   public JenkinsReporter() throws ParserConfigurationException, SAXException {
-    saxFactory = SAXParserFactory.newInstance();
+    final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     saxParser = saxFactory.newSAXParser();
-    factory = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     builder = factory.newDocumentBuilder();
-    xPathfactory = XPathFactory.newInstance();
+    final XPathFactory xPathfactory = XPathFactory.newInstance();
     xpath = xPathfactory.newXPath();
 
     final VelocityEngine velocityEngine = new VelocityEngine();
@@ -271,7 +257,7 @@ public class JenkinsReporter {
       final long durationSeconds = Long.parseLong(doc.getElementsByTagName("duration").item(0).getTextContent()) / 1000;
       build.setDuration(String.format("%d:%02d:%02d", durationSeconds / 3600, durationSeconds % 3600 / 60, durationSeconds % 60));
     }
-    catch (final FileNotFoundException _ignore) {
+    catch (final FileNotFoundException ignore) {
       // this job has no last completed build, skip it
     }
 
@@ -401,4 +387,15 @@ public class JenkinsReporter {
     return tmpView;
   }
 
+  public static final class JobByTimestampComparator implements Comparator<Job> {
+    @Override
+    public int compare(Job job1, Job job2) {
+      if (job1.getLastCompletedBuild() != null && job2.getLastCompletedBuild() != null) {
+        return -1 * job1.getLastCompletedBuild().getTimestamp().compareTo(job2.getLastCompletedBuild().getTimestamp());
+      }
+      else {
+        return -1;
+      }
+    }
+  }
 }

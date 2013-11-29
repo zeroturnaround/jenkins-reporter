@@ -44,7 +44,7 @@ public class Build {
   }
 
   public Date getTimestamp() {
-    return timestamp;
+    return (Date)timestamp.clone();
   }
 
   public URI getUrl() {
