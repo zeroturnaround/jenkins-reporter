@@ -27,7 +27,7 @@ import org.zeroturnaround.jenkins.reporter.model.Job.GoodJobPredicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public class View {
+public class JenkinsView {
   private int failCount;
   private Collection<Job> jobs = newArrayList();
   private int jobsTotal;

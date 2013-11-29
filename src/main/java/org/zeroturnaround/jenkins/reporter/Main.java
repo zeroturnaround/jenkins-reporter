@@ -9,22 +9,30 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeroturnaround.jenkins.reporter.model.JenkinsView;
 import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
 
+/**
+ * Main entry point
+ */
 public class Main {
+  private static final String VIEW_URL_PATTERN_PROPERTY = "jenkins.pattern";
+
+  private static final String JENKINS_URL_PROPERTY = "jenkins.url";
+
   private static final Logger log = LoggerFactory.getLogger(Main.class); // NOSONAR
 
   /**
    * The HTTP url of your Jenkins instances. For example http://jenkins/
    */
-  private static final String JENKINS_URL = System.getProperty("jenkins.url");
+  private static final String JENKINS_URL = System.getProperty(JENKINS_URL_PROPERTY);
 
   /**
    * The URL pattern for Jenkins. For example "%s/view/SomeView/view/%s". This will get expanded
    * to http://jenkins/view/SomeView/view/viewname. If you have some sort of view plugin installed
    * then this approach is required.
    */
-  private static final String VIEW_URL_PATTERN = System.getProperty("jenkins.view.url.pattern");
+  private static final String VIEW_URL_PATTERN = System.getProperty(VIEW_URL_PATTERN_PROPERTY);
 
   private static final String OUTPUT_FILE_NAME = System.getProperty("output.file");
 
@@ -34,6 +42,10 @@ public class Main {
     if (args.length == 0) {
       System.err.println("Please give the name of Jenkins view as parameter to this script.");
       System.exit(-1);
+    }
+
+    if (!validateArguments()) {
+      System.exit(1);
     }
 
     // lets support URL's ending with a slash and also without one
@@ -56,11 +68,27 @@ public class Main {
       final File outputFile = File.createTempFile(outputFileName, ".html");
       final PrintWriter out = new PrintWriter(new FileWriter(outputFile));
 
-      final JenkinsReporter app = new JenkinsReporter();
-      app.generateReport(viewUrl, out);
+      // ViewData viewData =
+      JenkinsHelper jHelper = (new JenkinsHelperBuilder()).createDefault();
+      JenkinsView viewData = jHelper.getViewData(viewUrl);
+
+      final JenkinsReportGenerator app = (new JenkinsReportGeneratorBuilder()).buildDefaultGenerator();
+      app.generateReport(viewData, out);
 
       log.info("Generated report to: " + outputFile);
     }
   }
 
+  private static boolean validateArguments() {
+    if (VIEW_URL_PATTERN == null) {
+      System.out.println(String.format("Please provide your Jenkins view url pattern with -D%s", VIEW_URL_PATTERN_PROPERTY));
+      return false;
+    }
+
+    if (JENKINS_URL == null) {
+      System.out.println(String.format("Please provide your jenkins URL via JVM property -D%s", JENKINS_URL_PROPERTY));
+      return false;
+    }
+    return true;
+  }
 }
