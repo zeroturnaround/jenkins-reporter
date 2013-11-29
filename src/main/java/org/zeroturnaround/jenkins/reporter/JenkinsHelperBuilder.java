@@ -18,10 +18,10 @@ public class JenkinsHelperBuilder {
       saxParser = saxFactory.newSAXParser();
     }
     catch (ParserConfigurationException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (SAXException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
 
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -36,7 +36,6 @@ public class JenkinsHelperBuilder {
     final XPathFactory xPathfactory = XPathFactory.newInstance();
     XPath xpath = xPathfactory.newXPath();
 
-    JenkinsViewAnalyser helper = new JenkinsViewAnalyser(builder, xpath, saxParser);
-    return helper;
+    return new JenkinsViewAnalyser(builder, xpath, saxParser);
   }
 }

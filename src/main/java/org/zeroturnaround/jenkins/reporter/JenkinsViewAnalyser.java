@@ -59,10 +59,10 @@ public class JenkinsViewAnalyser {
       doc = builder.parse(viewUrl.toASCIIString() + "/api/xml?tree=name,url");
     }
     catch (SAXException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     return doc.getElementsByTagName("name").item(0).getTextContent();
   }
@@ -79,13 +79,13 @@ public class JenkinsViewAnalyser {
       nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
     }
     catch (SAXException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
 
     return nodes.getLength();
@@ -96,10 +96,10 @@ public class JenkinsViewAnalyser {
       return builder.parse(fullUrl);
     }
     catch (SAXException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
   }
 
@@ -162,7 +162,7 @@ public class JenkinsViewAnalyser {
       nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
     }
     catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
 
     final Collection<Job> jobs = new ArrayList<Job>();
@@ -184,10 +184,10 @@ public class JenkinsViewAnalyser {
           job.setUrl(new URI(el.getElementsByTagName("url").item(0).getTextContent()));
         }
         catch (DOMException e) {
-          throw new RuntimeException(e);
+          throw new ProcessingException(e);
         }
         catch (URISyntaxException e) {
-          throw new RuntimeException(e);
+          throw new ProcessingException(e);
         }
         job.setColor(el.getElementsByTagName("color").item(0).getTextContent());
 
@@ -212,16 +212,16 @@ public class JenkinsViewAnalyser {
       build.setTestReport(readTestReport(build.getUrl()));
     }
     catch (DOMException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (SAXException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException(e);
     }
     build.setTimestamp(new Date(Long.parseLong(doc.getElementsByTagName("timestamp").item(0).getTextContent())));
     Calendar cal = Calendar.getInstance();

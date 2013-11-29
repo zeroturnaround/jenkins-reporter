@@ -28,9 +28,6 @@ import org.zeroturnaround.jenkins.reporter.model.TestCase;
 import com.google.common.base.Splitter;
 
 /**
- * Helper class to add comments (from file loaded using {@link #load(File)}) to generated test report
- * 
- * @author Ats Uiboupin
  */
 public class CommentsHelper {
 

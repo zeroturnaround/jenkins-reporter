@@ -32,15 +32,11 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.tools.generic.DateTool;
 import org.apache.velocity.tools.generic.EscapeTool;
 import org.apache.velocity.tools.generic.NumberTool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeroturnaround.jenkins.reporter.model.JenkinsView;
 import org.zeroturnaround.jenkins.reporter.model.Job;
 import org.zeroturnaround.jenkins.reporter.util.CommentsHelper;
 
 public class JenkinsReportGenerator {
-  private static final Logger log = LoggerFactory.getLogger(JenkinsReportGenerator.class); // NOSONAR
-
   private final Template template;
 
   public JenkinsReportGenerator(Template template) {

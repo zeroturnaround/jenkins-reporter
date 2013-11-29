@@ -21,7 +21,6 @@ public class Main {
   private static final String VIEW_URL_PATTERN_PROPERTY = "jenkins.pattern";
   private static final String JENKINS_URL_PROPERTY = "jenkins.url";
 
-
   /**
    * The HTTP url of your Jenkins instances. For example http://jenkins/
    */
@@ -40,7 +39,7 @@ public class Main {
 
   public static final void main(String[] args) throws Exception {
     if (args.length == 0) {
-      System.err.println("Please give the name of Jenkins view as parameter to this script.");
+      System.err.println("Please give the name of Jenkins view as parameter to this script."); // NOSONAR
       System.exit(-1);
     }
 
@@ -81,12 +80,12 @@ public class Main {
 
   private static boolean validateArguments() {
     if (VIEW_URL_PATTERN == null) {
-      System.out.println(String.format("Please provide your Jenkins view url pattern with -D%s", VIEW_URL_PATTERN_PROPERTY));
+      System.out.println(String.format("Please provide your Jenkins view url pattern with -D%s", VIEW_URL_PATTERN_PROPERTY)); // NOSONAR
       return false;
     }
 
     if (JENKINS_URL == null) {
-      System.out.println(String.format("Please provide your jenkins URL via JVM property -D%s", JENKINS_URL_PROPERTY));
+      System.out.println(String.format("Please provide your jenkins URL via JVM property -D%s", JENKINS_URL_PROPERTY)); // NOSONAR
       return false;
     }
     return true;
