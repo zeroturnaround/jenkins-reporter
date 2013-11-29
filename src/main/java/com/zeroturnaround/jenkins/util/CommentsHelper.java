@@ -92,10 +92,8 @@ public class CommentsHelper {
     boolean escaping = false;
     for (int i = 0; i < charArray.length; i++) {
       char c = charArray[i];
-      if (c == '=') {
-        if (!escaping) {
-          return i;
-        }
+      if (c == '=' && !escaping) {
+        return i;
       }
       if (escaping) {
         escaping = false;

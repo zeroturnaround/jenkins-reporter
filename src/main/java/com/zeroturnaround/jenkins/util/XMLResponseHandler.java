@@ -38,7 +38,7 @@ public class XMLResponseHandler implements ResponseHandler<Document> {
   }
 
   @Override
-  public Document handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+  public Document handleResponse(HttpResponse response) throws IOException {
     int status = response.getStatusLine().getStatusCode();
     if (status != HttpStatus.SC_OK) {
       throw new HttpResponseException(status, "200 status code expected but was " + status);

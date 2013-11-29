@@ -64,13 +64,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.zeroturnaround.jenkins.model.Build;
 import com.zeroturnaround.jenkins.model.Job;
-import com.zeroturnaround.jenkins.model.TestCase;
 import com.zeroturnaround.jenkins.model.TestReport;
 import com.zeroturnaround.jenkins.model.View;
 import com.zeroturnaround.jenkins.util.CommentsHelper;
@@ -246,14 +244,14 @@ public class JenkinsReporter {
     out.close();
   }
 
-  private void generateReport(URI viewUrl, PrintWriter out) throws DOMException, XPathExpressionException, URISyntaxException, SAXException, IOException,
+  private void generateReport(URI viewUrl, PrintWriter out) throws XPathExpressionException, URISyntaxException, SAXException, IOException,
       ParserConfigurationException {
     read(viewUrl);
 
     generateReport(out);
   }
 
-  private Build getLastCompletedBuild(Job job) throws ParserConfigurationException, SAXException, IOException, DOMException, URISyntaxException, XPathExpressionException {
+  private Build getLastCompletedBuild(Job job) throws ParserConfigurationException, SAXException, IOException, URISyntaxException, XPathExpressionException {
     final String infoMsg = "Fetching last completed build info for job " + job.getName();
     Build build = null;
 
@@ -323,7 +321,7 @@ public class JenkinsReporter {
     return doc;
   }
 
-  private void read(URI viewUrl) throws URISyntaxException, DOMException, SAXException, IOException, XPathExpressionException, ParserConfigurationException {
+  private void read(URI viewUrl) throws URISyntaxException, SAXException, IOException, XPathExpressionException, ParserConfigurationException {
     view = readView(viewUrl);
     view.setJobsTotal(countJobsTotal());
     view.setJobs(readJobs());
@@ -353,7 +351,7 @@ public class JenkinsReporter {
     return jobs;
   }
 
-  private Collection<Job> readChildrenJobs(Job parentJob) throws SAXException, IOException, XPathExpressionException, URISyntaxException, DOMException,
+  private Collection<Job> readChildrenJobs(Job parentJob) throws SAXException, IOException, XPathExpressionException, URISyntaxException,
       ParserConfigurationException {
     final String infoMsg = "Reading child jobs of matrix job '" + parentJob.getName() + "'...";
     final String uri = parentJob.getUrl().toASCIIString() + "/api/xml?xpath=/matrixProject/activeConfiguration&wrapper=activeConfigurations";
@@ -383,177 +381,7 @@ public class JenkinsReporter {
 
     final TestReport testReport = new TestReport();
 
-    final DefaultHandler handler = new DefaultHandler() {
-
-      boolean ageNode = false;
-      boolean classNameNode = false;
-      StringBuffer errorDetails, errorStackTrace;
-      boolean errorDetailsNode = false;
-      boolean errorStackTraceNode = false;
-      boolean failCountNode = false;
-      private boolean matrixJob;
-      boolean methodNameNode = false;
-      boolean passCountNode = false;
-      private boolean plainJob;
-      boolean rootNode = false;
-      boolean skipCountNode = false;
-      boolean statusNode = false;
-      TestCase testCase;
-      boolean totalCountNode = false;
-
-      @Override
-      public void characters(char ch[], int start, int length) throws SAXException {
-        if (rootNode && failCountNode) {
-          testReport.setFailCount(Integer.parseInt(new String(ch, start, length)));
-        }
-        else if (rootNode && skipCountNode) {
-          testReport.setSkipCount(Integer.parseInt(new String(ch, start, length)));
-        }
-        else if (rootNode && passCountNode) {
-          testReport.setPassCount(Integer.parseInt(new String(ch, start, length)));
-        }
-        else if (rootNode && totalCountNode) {
-          testReport.setTotalCount(Integer.parseInt(new String(ch, start, length)));
-        }
-        else if (statusNode) {
-          testCase.setStatus(new String(ch, start, length));
-        }
-        else if (ageNode) {
-          testCase.setAge(Integer.parseInt(new String(ch, start, length)));
-        }
-        else if (classNameNode) {
-          testCase.setClassName(new String(ch, start, length));
-        }
-        else if (methodNameNode) {
-          testCase.setMethodName(new String(ch, start, length));
-        }
-        else if (errorDetailsNode) {
-          errorDetails.append(new String(ch, start, length));
-        }
-        else if (errorStackTraceNode) {
-          errorStackTrace.append(new String(ch, start, length));
-        }
-      }
-
-      @Override
-      public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("matrixTestResult")) {
-          rootNode = false;
-        }
-        else if (qName.equals("testResult")) {
-          rootNode = false;
-        }
-        else if (qName.equalsIgnoreCase("case")) {
-          if (testCase.getStatus() != null && (testCase.getStatus().equals("FAILED") || testCase.getStatus().equals("REGRESSION"))) {
-            testReport.getTestCases().add(testCase);
-            testCase = new TestCase(); // to avoid mutating it later (e.g. <name> tag occurs outside of <case> too)
-          }
-        }
-        else if (failCountNode) {
-          failCountNode = false;
-        }
-        else if (qName.equalsIgnoreCase("skipCount")) {
-          skipCountNode = false;
-        }
-        else if (qName.equalsIgnoreCase("passCount")) {
-          passCountNode = false;
-        }
-        else if (qName.equalsIgnoreCase("totalCount")) {
-          totalCountNode = false;
-        }
-        else if (statusNode) {
-          statusNode = false;
-        }
-        else if (ageNode) {
-          ageNode = false;
-        }
-        else if (classNameNode) {
-          classNameNode = false;
-        }
-        else if (methodNameNode) {
-          methodNameNode = false;
-        }
-        else if (qName.equalsIgnoreCase("errorDetails")) {
-          errorDetailsNode = false;
-          testCase.setErrorDetails(errorDetails.toString());
-          errorDetails = null;
-        }
-        else if (qName.equalsIgnoreCase("errorStackTrace")) {
-          errorStackTraceNode = false;
-          testCase.setErrorStackTrace(errorStackTrace.toString());
-          errorStackTrace = null;
-        }
-      }
-
-      @Override
-      public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        if (qName.equals("matrixTestResult")) {
-          matrixJob = true;
-          rootNode = true;
-        }
-        else if (qName.equals("testResult")) {
-          plainJob = true;
-          rootNode = true;
-        }
-        else if (qName.equalsIgnoreCase("childReport")) {
-          if (matrixJob) {
-            // "childReport" is next element after the header in
-            // matrix job
-            rootNode = false;
-          }
-        }
-        else if (qName.equalsIgnoreCase("suite")) {
-          if (plainJob) {
-            // "suite" is next element after the header in
-            // plain job
-            rootNode = false;
-
-            // in case of plain job we need to calculate totalCount
-            // manually
-            if (testReport.getTotalCount() == 0) {
-              testReport.setTotalCount(testReport.getPassCount() + testReport.getFailCount() + testReport.getSkipCount());
-            }
-          }
-        }
-        else if (qName.equalsIgnoreCase("case")) {
-          testCase = new TestCase();
-        }
-        else if (qName.equalsIgnoreCase("failCount")) {
-          failCountNode = true;
-        }
-        else if (qName.equalsIgnoreCase("skipCount")) {
-          skipCountNode = true;
-        }
-        else if (qName.equalsIgnoreCase("passCount")) {
-          passCountNode = true;
-        }
-        else if (qName.equalsIgnoreCase("totalCount")) {
-          totalCountNode = true;
-        }
-        else if (qName.equalsIgnoreCase("status")) {
-          statusNode = true;
-        }
-        else if (qName.equalsIgnoreCase("age")) {
-          ageNode = true;
-        }
-        else if (qName.equalsIgnoreCase("className")) {
-          classNameNode = true;
-        }
-        else if (qName.equalsIgnoreCase("name")) {
-          methodNameNode = true;
-        }
-        else if (qName.equalsIgnoreCase("errorDetails")) {
-          errorDetailsNode = true;
-          errorDetails = new StringBuffer();
-        }
-        else if (qName.equalsIgnoreCase("errorStackTrace")) {
-          errorStackTraceNode = true;
-          errorStackTrace = new StringBuffer();
-        }
-
-      }
-
-    };
+    final DefaultHandler handler = new ReadTestReportHandler(testReport);
 
     try {
       saxParser.parse(buildUrl + "testReport/api/xml", handler);
@@ -564,14 +392,14 @@ public class JenkinsReporter {
     return testReport;
   }
 
-  private View readView(URI viewUrl) throws DOMException, URISyntaxException, SAXException, IOException {
+  private View readView(URI viewUrl) throws URISyntaxException, SAXException, IOException {
     final Document doc = builder.parse(viewUrl.toASCIIString() + "/api/xml?tree=name,url");
 
-    final View view = new View();
-    view.setUrl(new URI(doc.getElementsByTagName("url").item(0).getTextContent()));
-    view.setName(doc.getElementsByTagName("name").item(0).getTextContent());
+    final View tmpView = new View();
+    tmpView.setUrl(new URI(doc.getElementsByTagName("url").item(0).getTextContent()));
+    tmpView.setName(doc.getElementsByTagName("name").item(0).getTextContent());
 
-    return view;
+    return tmpView;
   }
 
 }

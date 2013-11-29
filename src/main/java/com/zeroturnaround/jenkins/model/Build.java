@@ -68,7 +68,7 @@ public class Build {
   }
 
   public void setTimestamp(Date timestamp) {
-    this.timestamp = timestamp;
+    this.timestamp = (Date)timestamp.clone();
   }
 
   public void setUrl(URI url) {

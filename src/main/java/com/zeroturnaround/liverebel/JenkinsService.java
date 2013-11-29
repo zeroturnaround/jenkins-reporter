@@ -95,7 +95,7 @@ public class JenkinsService {
     httpClient.addRequestInterceptor(preemptiveAuth, 0);
   }
 
-  public Document parseXML(String uri) throws ClientProtocolException, IOException {
+  public Document parseXML(String uri) throws IOException {
     log.trace("Requesting url {} ...", uri);
     HttpGet get = new HttpGet(uri);
     return httpClient.execute(get, handler);
