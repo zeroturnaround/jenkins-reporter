@@ -103,20 +103,20 @@ public class DiffConfigurations {
     }
   }
 
-  private static final Logger log = LoggerFactory.getLogger(DiffConfigurations.class);
+  private static final Logger log = LoggerFactory.getLogger(DiffConfigurations.class); //NOSONAR
 
   private static final String[] IGNORE_XPATHS = {
       "/project[1]/description[1]/text()[1]",
       "/matrix-project[1]/description[1]/text()[1]",
       "/maven2-moduleset[1]/description[1]/text()[1]",
   };
-  private static final Set<String> ignoreXpaths = new HashSet<String>(Arrays.asList(IGNORE_XPATHS));
+  private static final Set<String> IGNORE_XPATHS_SET = new HashSet<String>(Arrays.asList(IGNORE_XPATHS));
 
   private static final String[] IGNORE_REASONS = {
       "sequence of child nodes",
       "presence of child node",
   };
-  private static final Set<String> ignoreReasons = new HashSet<String>(Arrays.asList(IGNORE_REASONS));
+  private static final Set<String> IGNORE_REASONS_SET = new HashSet<String>(Arrays.asList(IGNORE_REASONS));
 
   public DiffConfigurations() {
 
@@ -124,8 +124,8 @@ public class DiffConfigurations {
 
   public static void diffConfigurations(String[] args) throws Exception {
     if (args.length != 3) {
-      System.err.println("Diff usage:");
-      System.err.println("java -jar jenkins-reporter-standalone.jar diff %username% %authtoken%");
+      System.out.println("Diff usage:");
+      System.out.println("java -jar jenkins-reporter-standalone.jar diff %username% %authtoken%");
       System.exit(-1);
     }
 
@@ -200,11 +200,11 @@ public class DiffConfigurations {
   }
 
   private boolean isIgnored(Difference difference) {
-    if (ignoreXpaths.contains(difference.getControlNodeDetail().getXpathLocation())
-        || ignoreXpaths.contains(difference.getTestNodeDetail().getXpathLocation())) {
+    if (IGNORE_XPATHS_SET.contains(difference.getControlNodeDetail().getXpathLocation())
+        || IGNORE_XPATHS_SET.contains(difference.getTestNodeDetail().getXpathLocation())) {
       return true;
     }
-    else if (ignoreReasons.contains(difference.getDescription())) {
+    else if (IGNORE_REASONS_SET.contains(difference.getDescription())) {
       return true;
     }
 
@@ -220,7 +220,8 @@ public class DiffConfigurations {
   private boolean isEqualTextNodes(Node a, Node b) {
     if (!(a instanceof Text))
       return false;
-    if (!(a instanceof Text))
+    
+    if (!(b instanceof Text))
       return false;
 
     Text textA = (Text) a;
