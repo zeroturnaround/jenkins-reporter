@@ -15,32 +15,26 @@
  */
 package com.zeroturnaround.jenkins.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class URLParamEncoder {
+  public static String encode(String s) {
+    String result;
 
-  public static String encode(String input) {
-    final StringBuilder resultStr = new StringBuilder();
-    for (final char ch : input.toCharArray()) {
-      if (isUnsafe(ch)) {
-        resultStr.append('%');
-        resultStr.append(toHex(ch / 16));
-        resultStr.append(toHex(ch % 16));
-      }
-      else {
-        resultStr.append(ch);
-      }
+    try {
+      result = URLEncoder.encode(s, "UTF-8")
+          .replaceAll("\\+", "%20")
+          .replaceAll("\\%21", "!")
+          .replaceAll("\\%27", "'")
+          .replaceAll("\\%28", "(")
+          .replaceAll("\\%29", ")")
+          .replaceAll("\\%7E", "~");
     }
-    return resultStr.toString();
-  }
-
-  private static boolean isUnsafe(char ch) {
-    if (ch > 128 || ch < 0) {
-      return true;
+    catch (UnsupportedEncodingException e) {
+      result = s;
     }
-    return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
-  }
 
-  private static char toHex(int ch) {
-    return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
+    return result;
   }
-
 }

@@ -236,7 +236,8 @@ public class DiffConfigurations {
 
     Set<String> unmatchedJobs = new HashSet<String>();
 
-    for (String name : originalJobs.keySet()) {
+    for (Map.Entry<String, Job> entry : originalJobs.entrySet()) {
+      String name = entry.getKey();
       String mappedName = mapper.mapJobName(name);
       if (mappedName == null) {
         log.warn("Job {} in {} cannot be mapped to correspondending job in {} view.", name, original.getName(), transformed.getName());
@@ -249,7 +250,7 @@ public class DiffConfigurations {
           unmatchedJobs.add(name);
         }
         else {
-          jobMapping.put(originalJobs.get(name), mappedJob);
+          jobMapping.put(entry.getValue(), mappedJob);
           transformedJobs.remove(mappedName);
         }
       }
