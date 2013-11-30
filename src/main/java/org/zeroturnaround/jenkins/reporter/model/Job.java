@@ -20,11 +20,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.base.Predicate;
 
 public class Job {
+  private static final Logger log = LoggerFactory.getLogger(Job.class); // NOSONAR
+
   public static class BadJobPredicate extends JobColorPredicate {
     public BadJobPredicate() {
       super("red", "red_anime", "aborted", "aborted_anime", "yellow", "yellow_anime");
@@ -121,6 +125,7 @@ public class Job {
   }
 
   public void setUrl(URI url) {
+    log.debug("Setting URL to {}", url);
     this.url = url;
   }
 }

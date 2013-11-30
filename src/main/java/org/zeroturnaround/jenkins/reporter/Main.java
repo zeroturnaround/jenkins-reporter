@@ -19,7 +19,7 @@ import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
  */
 public class Main {
   private static final Logger log = LoggerFactory.getLogger(Main.class); // NOSONAR
-
+  
   private static final String VIEW_URL_PATTERN_PROPERTY = "jenkins.pattern";
   private static final String JENKINS_URL_PROPERTY = "jenkins.url";
 

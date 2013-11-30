@@ -29,6 +29,7 @@ public class URLParamEncoder {
           .replaceAll("\\%27", "'")
           .replaceAll("\\%28", "(")
           .replaceAll("\\%29", ")")
+          .replaceAll("\\%26", "&")
           .replaceAll("\\%7E", "~");
     }
     catch (UnsupportedEncodingException e) {

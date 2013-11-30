@@ -36,9 +36,9 @@ public class JenkinsViewAnalyser {
   private DocumentBuilder builder;
   private final XPath xpath;
   private final SAXParser saxParser;
-  
+
   private static final int SECONDS_IN_MINUTE = 60;
-  private static final int SECONDS_IN_HOUR= SECONDS_IN_MINUTE*60;
+  private static final int SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60;
   private static final int MILLISECONDS_IN_SECOND = 1000;
 
   public JenkinsViewAnalyser(DocumentBuilder builder, XPath xpath, SAXParser saxParser) {
@@ -51,10 +51,31 @@ public class JenkinsViewAnalyser {
     JenkinsView viewData = new JenkinsView();
 
     viewData.setName(getViewName(viewUrl));
+    viewData.setUrl(getViewURL(viewUrl));
     viewData.setJobsTotal(queryJobCount(viewUrl));
     viewData.setJobs(readJobs(viewUrl));
 
     return viewData;
+  }
+
+  private URI getViewURL(URI viewUrl) {
+    try {
+      Document doc = builder.parse(viewUrl.toASCIIString() + "/api/xml?tree=name,url");
+      URI uri = new URI(doc.getElementsByTagName("url").item(0).getTextContent());
+      return uri;
+    }
+    catch (SAXException e) {
+      throw new ProcessingException(e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException(e);
+    }
+    catch (DOMException e) {
+      throw new ProcessingException(e);
+    }
+    catch (URISyntaxException e) {
+      throw new ProcessingException(e);
+    }
   }
 
   private String getViewName(URI viewUrl) {
@@ -102,6 +123,9 @@ public class JenkinsViewAnalyser {
     catch (SAXException e) {
       throw new ProcessingException(e);
     }
+    catch (FileNotFoundException e) {
+      throw new DocumentNotFoundException("Not finding document " + fullUrl, e);
+    }
     catch (IOException e) {
       throw new ProcessingException(e);
     }
@@ -136,21 +160,24 @@ public class JenkinsViewAnalyser {
   private Collection<Job> readChildrenJobs(Job parentJob) {
     final String uri = parentJob.getUrl().toASCIIString() + "/api/xml?xpath=/matrixProject/activeConfiguration&wrapper=activeConfigurations";
 
-    log.debug("Reading child jobs of matrix job '{}'...", parentJob.getName());
+    log.debug("Reading child jobs of matrix job '{}' at '{}'", parentJob.getName(), uri.toString());
     final Document doc = builderParse(uri);
 
     final Collection<Job> jobs = parseJobsFromXml(doc, "activeConfiguration", false);
 
-    // call jenkins after parsing xml
     if (!jobs.isEmpty()) {
       log.info("Fetching last completed build info for " + jobs.size() + " child jobs of " + parentJob.getName() + "...");
 
       for (final Iterator<Job> iter = jobs.iterator(); iter.hasNext();) {
         final Job job = iter.next();
-        job.setLastCompletedBuild(getLastCompletedBuild(job));
-
-        if (job.getLastCompletedBuild() == null) {
-          // job has no last completed build nor children, ignore it
+        try {
+          Build lastCompletedBuild = getLastCompletedBuild(job);
+          job.setLastCompletedBuild(lastCompletedBuild);
+        }
+        // sometimes there is no last completed build
+        // we can ignore the job
+        catch (DocumentNotFoundException e) {
+          job.setLastCompletedBuild(null);
           iter.remove();
         }
       }
@@ -249,7 +276,8 @@ public class JenkinsViewAnalyser {
       saxParser.parse(buildUrl + "testReport/api/xml", handler);
     }
     catch (FileNotFoundException e) {
-      throw new ProcessingException(e);
+      log.debug("No test report available for {}", buildUrl);
+      return null;
     }
 
     return testReport;
