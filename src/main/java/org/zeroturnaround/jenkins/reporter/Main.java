@@ -79,7 +79,7 @@ public class Main {
         out = new PrintWriter(new FileWriter(outputFile));
       }
       catch (IOException e) {
-        throw new ProcessingException(e);
+        throw new ProcessingException("Unable to create file "+outputFileName, e);
       }
 
       // ViewData viewData =
