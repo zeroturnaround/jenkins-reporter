@@ -33,7 +33,7 @@ public class Main {
    * to http://jenkins/view/SomeView/view/viewname. If you have some sort of view plugin installed
    * then this approach is required.
    */
-  private static final String VIEW_URL_PATTERN = System.getProperty(VIEW_URL_PATTERN_PROPERTY);
+  private static final String VIEW_URL_PATTERN = System.getProperty(VIEW_URL_PATTERN_PROPERTY, "%s/view/%s");
 
   private static final String OUTPUT_FILE_NAME = System.getProperty("output.file");
 
