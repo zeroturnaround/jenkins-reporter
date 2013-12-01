@@ -22,7 +22,7 @@ public class Main {
   private static final Logger log = LoggerFactory.getLogger(Main.class); // NOSONAR
   
   private static final String JENKINS_URL_PROPERTY = "reporter.jenkins.url";
-  private static final String VIEW_URL_PREFIX_PROPERTY = "reporter.jenkins.view.url.prefix";
+  private static final String VIEW_URL_PREFIX_PROPERTY = "reporter.jenkins.view.prefix";
   private static final String REPORTER_NAME_PREFIX_PROPERTY = "reporter.name.prefix";
   private static final String REPORTER_OUTPUT_FILE_PROPERTY = "reporter.output.file";
 
