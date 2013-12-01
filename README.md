@@ -26,7 +26,4 @@ Create a Jenkins job that runs this command for you and archive the results. You
 
 ### Screenshot
 
-https://raw.github.com/zeroturnaround/jenkins-reporter/master/etc/screenshot-001.png
-
-
-
+![Screenshot](https://raw.github.com/zeroturnaround/jenkins-reporter/master/etc/screenshot-001.png)
