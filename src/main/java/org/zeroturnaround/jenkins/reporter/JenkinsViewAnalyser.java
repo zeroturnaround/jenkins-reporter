@@ -181,7 +181,7 @@ public class JenkinsViewAnalyser {
 
         // these listings also list "Groups" that are not actually jobs
         // I'll just ignore these
-        if (el.getElementsByTagName("color") == null) {
+        if (el.getElementsByTagName("color").getLength() == 0) {
           continue;
         }
 
