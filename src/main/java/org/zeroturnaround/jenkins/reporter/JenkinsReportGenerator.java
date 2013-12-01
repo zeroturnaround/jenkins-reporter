@@ -17,8 +17,6 @@ package org.zeroturnaround.jenkins.reporter;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
@@ -34,7 +32,6 @@ import org.apache.velocity.tools.generic.EscapeTool;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.zeroturnaround.jenkins.reporter.model.JenkinsView;
 import org.zeroturnaround.jenkins.reporter.model.Job;
-import org.zeroturnaround.jenkins.reporter.util.CommentsHelper;
 
 public class JenkinsReportGenerator {
   private final Template template;
@@ -74,7 +71,6 @@ public class JenkinsReportGenerator {
     context.put("view", viewData);
     context.put("failedJobs", failedJobs);
     context.put("passedJobs", passedJobs);
-    context.put("commentsHelper", createCommentsHelper(viewData.getName()));
 
     final StringWriter writer = new StringWriter();
     template.merge(context, writer);
@@ -83,14 +79,6 @@ public class JenkinsReportGenerator {
 
     out.flush();
     out.close();
-  }
-
-  // more relaxed file format - only "=" sign should be escaped in the key
-  // with "\"
-  private static CommentsHelper createCommentsHelper(final String jenkinsViewName) {
-    final String failureCommentsDir = "src/main/resources";
-    final File file = new File(failureCommentsDir, "failureComments-" + jenkinsViewName + ".properties");
-    return new CommentsHelper().load(file);
   }
 
   public static final class JobByTimestampComparator implements Comparator<Job> {

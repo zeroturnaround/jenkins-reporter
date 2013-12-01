@@ -227,7 +227,6 @@
 								<ul class="testResults job_${job.id}_testResults childJob_${childJob.id}_testResults" style="display: #if($hideTestReports)none#{else}block#{end};">
 									#if($childJob.lastCompletedBuild.testReport)
 										#foreach ($testCase in $childJob.lastCompletedBuild.testReport.testCases)
-											#set ($comment = $commentsHelper.getComment($testCase))
 											#set ($showErrorDetails = $testCase.errorDetails || $testCase.errorStackTrace)
 											
 											<li>
@@ -248,14 +247,6 @@
 													</div>
 												#else
 													${testCase.className}.${testCase.methodName} (<span class="age">Age: <span class="#if($testCase.age == 1)regression#{else}failure#end">${testCase.age}</span></span>)
-												#end
-												<!-- FIXME "NONE" is ugly workaround to avoid using old comment for each next testCase -->
-												#if($comment && $comment != "NONE")
-													Comment:
-													<span style="color: red">
-														$commentsHelper.wrapIssueNumberWithLink($comment)
-													</span>
-													#set ($comment = "NONE")
 												#end
 											</li>
 											
