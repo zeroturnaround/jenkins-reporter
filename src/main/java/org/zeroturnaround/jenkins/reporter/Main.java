@@ -20,9 +20,11 @@ import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
  */
 public class Main {
   private static final Logger log = LoggerFactory.getLogger(Main.class); // NOSONAR
-  
+
   private static final String JENKINS_URL_PROPERTY = "reporter.jenkins.url";
   private static final String VIEW_URL_PREFIX_PROPERTY = "reporter.jenkins.view.prefix";
+  private static final String JENKINS_USERNAME_PROPERTY = "reporter.jenkins.username";
+  private static final String JENKINS_API_TOKEN_PROPERTY = "reporter.jenkins.api.token";
   private static final String REPORTER_NAME_PREFIX_PROPERTY = "reporter.name.prefix";
   private static final String REPORTER_OUTPUT_FILE_PROPERTY = "reporter.output.file";
 
@@ -40,6 +42,9 @@ public class Main {
 
   private static final String OUTPUT_FILE_NAME = System.getProperty(REPORTER_OUTPUT_FILE_PROPERTY);
   public static final String JOB_NAME_PREFIX = System.getProperty(REPORTER_NAME_PREFIX_PROPERTY);
+
+  public static final String JENKINS_USERNAME = System.getProperty(JENKINS_USERNAME_PROPERTY);
+  public static final String JENKINS_API_TOKEN = System.getProperty(JENKINS_API_TOKEN_PROPERTY);
 
   public static final void main(String[] args) {
     if (args.length == 0) {
@@ -97,7 +102,7 @@ public class Main {
       }
 
       // ViewData viewData =
-      JenkinsViewAnalyser jHelper = (new JenkinsHelperBuilder()).createDefault();
+      JenkinsViewAnalyser jHelper = (new JenkinsHelperBuilder()).createDefault(JENKINS_USERNAME, JENKINS_API_TOKEN);
       JenkinsView viewData = jHelper.getViewData(viewUrl);
 
       final JenkinsReportGenerator app = (new JenkinsReportGeneratorBuilder()).buildDefaultGenerator();
@@ -118,16 +123,22 @@ public class Main {
     System.out.println("Program Usage");
     System.out.println();
     System.out.println("Available options:");
-    System.out.println("Required -D"+JENKINS_URL_PROPERTY+"=http://your-jenkins-instance.com/");
+    System.out.println("Required -D" + JENKINS_URL_PROPERTY + "=http://your-jenkins-instance.com/");
     System.out.println();
-    System.out.println("Optional -D"+VIEW_URL_PREFIX_PROPERTY+"=/view/");
+    System.out.println("Optional -D" + VIEW_URL_PREFIX_PROPERTY + "=/view/");
     System.out.println("\tFor nested views you want to specify the address part before the view. Defaults to /view/");
     System.out.println();
-    System.out.println("Optional -D"+REPORTER_NAME_PREFIX_PROPERTY+"=job-name-prefix");
+    System.out.println("Optional -D" + REPORTER_NAME_PREFIX_PROPERTY + "=job-name-prefix");
     System.out.println("\tOnly include jobs with names that start with this prefix.");
     System.out.println();
-    System.out.println("Optional -D"+REPORTER_OUTPUT_FILE_PROPERTY+"=output-file-name");
+    System.out.println("Optional -D" + REPORTER_OUTPUT_FILE_PROPERTY + "=output-file-name");
     System.out.println("\tSpecify output filename. By default writes to TMP folder and outputs file name");
+    System.out.println();
+    System.out.println("Optional -D" + JENKINS_USERNAME_PROPERTY + "=jenkins-user-name");
+    System.out.println("\tSpecify the username for talking to the Jenkins instance.");
+    System.out.println();
+    System.out.println("Optional -D" + JENKINS_API_TOKEN_PROPERTY + "=jenkins-api-token");
+    System.out.println("\tSpecify the api token of the username of the Jenkins instance.");
   }
 
   private static boolean validateArguments() {

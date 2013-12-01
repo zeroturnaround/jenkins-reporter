@@ -2,6 +2,7 @@ package org.zeroturnaround.jenkins.reporter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.http.client.utils.HttpClientUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -36,15 +38,17 @@ public class JenkinsViewAnalyser {
   private DocumentBuilder builder;
   private final XPath xpath;
   private final SAXParser saxParser;
+  private final JenkinsHttpClient jhc;
 
   private static final int SECONDS_IN_MINUTE = 60;
   private static final int SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60;
   private static final int MILLISECONDS_IN_SECOND = 1000;
 
-  public JenkinsViewAnalyser(DocumentBuilder builder, XPath xpath, SAXParser saxParser) {
+  public JenkinsViewAnalyser(DocumentBuilder builder, XPath xpath, SAXParser saxParser, JenkinsHttpClient jhc) {
     this.builder = builder;
     this.xpath = xpath;
     this.saxParser = saxParser;
+    this.jhc = jhc;
   }
 
   public JenkinsView getViewData(URI viewUrl) {
@@ -52,7 +56,7 @@ public class JenkinsViewAnalyser {
 
     viewData.setName(getViewName(viewUrl));
     viewData.setUrl(getViewURL(viewUrl));
-    viewData.setJobsTotal(queryJobCount(viewUrl));
+    viewData.setJobsTotal(getJobCount(viewUrl));
     viewData.setJobs(readJobs(viewUrl));
 
     return viewData;
@@ -60,15 +64,10 @@ public class JenkinsViewAnalyser {
 
   private URI getViewURL(URI viewUrl) {
     try {
-      Document doc = builder.parse(viewUrl.toASCIIString() + "/api/xml?tree=name,url");
+
+      Document doc = jhc.fetchAsXMLDocument(viewUrl.toASCIIString() + "/api/xml?tree=name,url");
       URI uri = new URI(doc.getElementsByTagName("url").item(0).getTextContent());
       return uri;
-    }
-    catch (SAXException e) {
-      throw new ProcessingException(e);
-    }
-    catch (IOException e) {
-      throw new ProcessingException(e);
     }
     catch (DOMException e) {
       throw new ProcessingException(e);
@@ -80,34 +79,20 @@ public class JenkinsViewAnalyser {
 
   private String getViewName(URI viewUrl) {
     Document doc;
-    try {
-      doc = builder.parse(viewUrl.toASCIIString() + "/api/xml?tree=name,url");
-    }
-    catch (SAXException e) {
-      throw new ProcessingException(e);
-    }
-    catch (IOException e) {
-      throw new ProcessingException(e);
-    }
+    doc = jhc.fetchAsXMLDocument(viewUrl.toASCIIString() + "/api/xml?tree=name,url");
     return doc.getElementsByTagName("name").item(0).getTextContent();
   }
 
-  private int queryJobCount(URI uri) {
+  private int getJobCount(URI uri) {
     final String fullUrl = uri.toASCIIString() + "/api/xml?wrapper=jobs&tree=jobs[name,url,color]";
 
     log.debug("Counting total number of jobs for '{}'", fullUrl);
 
     NodeList nodes;
     try {
-      Document doc = builder.parse(fullUrl);
+      Document doc = jhc.fetchAsXMLDocument(fullUrl);
       final XPathExpression expr = xpath.compile("//job");
       nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-    }
-    catch (SAXException e) {
-      throw new ProcessingException(e);
-    }
-    catch (IOException e) {
-      throw new ProcessingException(e);
     }
     catch (XPathExpressionException e) {
       throw new ProcessingException(e);
@@ -116,27 +101,12 @@ public class JenkinsViewAnalyser {
     return nodes.getLength();
   }
 
-  private Document builderParse(String fullUrl) {
-    try {
-      return builder.parse(fullUrl);
-    }
-    catch (SAXException e) {
-      throw new ProcessingException(e);
-    }
-    catch (FileNotFoundException e) {
-      throw new DocumentNotFoundException("Not finding document " + fullUrl, e);
-    }
-    catch (IOException e) {
-      throw new ProcessingException(e);
-    }
-  }
-
   private Collection<Job> readJobs(URI uri) {
     final String fullUrl = uri.toASCIIString() + "/api/xml?xpath=//job&wrapper=jobs&tree=jobs[name,url,color]";
 
     log.debug("Reading information about failing jobs for '{}'", fullUrl);
 
-    Document doc = builderParse(fullUrl);
+    Document doc = jhc.fetchAsXMLDocument(fullUrl);
 
     final Collection<Job> jobs = parseJobsFromXml(doc, "job", true);
 
@@ -161,7 +131,7 @@ public class JenkinsViewAnalyser {
     final String uri = parentJob.getUrl().toASCIIString() + "/api/xml?xpath=/matrixProject/activeConfiguration&wrapper=activeConfigurations";
 
     log.debug("Reading child jobs of matrix job '{}' at '{}'", parentJob.getName(), uri.toString());
-    final Document doc = builderParse(uri);
+    final Document doc = jhc.fetchAsXMLDocument(uri);
 
     final Collection<Job> jobs = parseJobsFromXml(doc, "activeConfiguration", false);
 
@@ -212,7 +182,8 @@ public class JenkinsViewAnalyser {
         final Job job = new Job();
         job.setName(name);
         try {
-          job.setUrl(new URI(el.getElementsByTagName("url").item(0).getTextContent()));
+          String jobUrl = el.getElementsByTagName("url").item(0).getTextContent();
+          job.setUrl(new URI(jobUrl));
         }
         catch (DOMException e) {
           throw new ProcessingException(e);
@@ -233,7 +204,7 @@ public class JenkinsViewAnalyser {
 
     log.debug("Fetching last completed build info for job {}", job.getName());
     final String uri = job.getUrl() + "lastCompletedBuild/api/xml?tree=number,url,timestamp,duration,result";
-    final Document doc = builderParse(uri);
+    final Document doc = jhc.fetchAsXMLDocument(uri);
 
     build = new Build();
     build.setId(Integer.parseInt(doc.getElementsByTagName("number").item(0).getTextContent()));
@@ -273,7 +244,8 @@ public class JenkinsViewAnalyser {
     final DefaultHandler handler = new ReadTestReportHandler(testReport);
 
     try {
-      saxParser.parse(buildUrl + "testReport/api/xml", handler);
+      InputStream is = jhc.fetchAsInputStream(buildUrl + "testReport/api/xml");
+      saxParser.parse(is, handler);
     }
     catch (FileNotFoundException e) {
       log.debug("No test report available for {}", buildUrl);
