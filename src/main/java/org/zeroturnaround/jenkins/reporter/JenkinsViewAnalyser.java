@@ -179,6 +179,12 @@ public class JenkinsViewAnalyser {
           continue;
         }
 
+        // these listings also list "Groups" that are not actually jobs
+        // I'll just ignore these
+        if (el.getElementsByTagName("color") == null) {
+          continue;
+        }
+
         final Job job = new Job();
         job.setName(name);
         try {
@@ -191,8 +197,8 @@ public class JenkinsViewAnalyser {
         catch (URISyntaxException e) {
           throw new ProcessingException(e);
         }
-        job.setColor(el.getElementsByTagName("color").item(0).getTextContent());
 
+        job.setColor(el.getElementsByTagName("color").item(0).getTextContent());
         jobs.add(job);
       }
     }
