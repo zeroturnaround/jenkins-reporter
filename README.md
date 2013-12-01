@@ -1,13 +1,3 @@
-This script creates HTML report with the list of failed tests for given view in Jenkins.
-
-Build the project and run executable JAR from "target" folder, like
-
-java -jar target/jenkins-reporter-0.0.1-SNAPSHOT-standalone.jar "LR 2.7" "LR 2.7 Staging"
-
-The app will generate two HTML files and will open them in your browser.
-
-NB! It only shows failed jobs in the reports, which are not in running state.  
-
 Jenkins Reporter
 =========================
 
@@ -35,6 +25,8 @@ This will generate a report and if run on a desktop will open it in your browser
 Create a Jenkins job that runs this command for you and archive the results. You will always have up to date results for your most important views.
 
 ### Screenshot
+
+https://raw.github.com/zeroturnaround/jenkins-reporter/master/etc/screenshot-001.png
 
 
 
