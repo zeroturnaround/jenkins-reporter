@@ -1,5 +1,6 @@
 package org.zeroturnaround.jenkins.reporter;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,8 +21,10 @@ import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
 public class Main {
   private static final Logger log = LoggerFactory.getLogger(Main.class); // NOSONAR
   
-  private static final String VIEW_URL_PATTERN_PROPERTY = "jenkins.pattern";
-  private static final String JENKINS_URL_PROPERTY = "jenkins.url";
+  private static final String JENKINS_URL_PROPERTY = "reporter.jenkins.url";
+  private static final String VIEW_URL_PREFIX_PROPERTY = "reporter.jenkins.view.url.prefix";
+  private static final String REPORTER_NAME_PREFIX_PROPERTY = "reporter.name.prefix";
+  private static final String REPORTER_OUTPUT_FILE_PROPERTY = "reporter.output.file";
 
   /**
    * The HTTP url of your Jenkins instances. For example http://jenkins/
@@ -29,23 +32,26 @@ public class Main {
   private static final String JENKINS_URL = System.getProperty(JENKINS_URL_PROPERTY);
 
   /**
-   * The URL pattern for Jenkins. For example "%s/view/SomeView/view/%s". This will get expanded
-   * to http://jenkins/view/SomeView/view/viewname. If you have some sort of view plugin installed
-   * then this approach is required.
+   * If you are using nested views then you need to set prefix for the URL for the views. By default
+   * the value is /view/ so that the URL construction be like JENKINS_URL + /view/ + viewName. For
+   * nested view you might need to do some like /view/NestedGroup/view/
    */
-  private static final String VIEW_URL_PATTERN = System.getProperty(VIEW_URL_PATTERN_PROPERTY, "%s/view/%s");
+  private static final String VIEW_URL_PREFIX = System.getProperty(VIEW_URL_PREFIX_PROPERTY, "/view/");
 
-  private static final String OUTPUT_FILE_NAME = System.getProperty("output.file");
-
-  public static final String JOB_NAME_PREFIX = System.getProperty("jobName.prefix");
+  private static final String OUTPUT_FILE_NAME = System.getProperty(REPORTER_OUTPUT_FILE_PROPERTY);
+  public static final String JOB_NAME_PREFIX = System.getProperty(REPORTER_NAME_PREFIX_PROPERTY);
 
   public static final void main(String[] args) {
     if (args.length == 0) {
       System.err.println("Please give the name of Jenkins view as parameter to this script."); // NOSONAR
+      System.out.println();
+      printUsage();
       System.exit(-1);
     }
 
     if (!validateArguments()) {
+      System.out.println();
+      printUsage();
       System.exit(1);
     }
 
@@ -58,7 +64,15 @@ public class Main {
     for (final String jenkinsViewName : args) {
       URI viewUrl;
       try {
-        viewUrl = new URI(String.format(VIEW_URL_PATTERN, jenkinsUrl, URLParamEncoder.encode(jenkinsViewName)));
+        String viewUrlPrefix = VIEW_URL_PREFIX;
+        if (!viewUrlPrefix.startsWith("/")) {
+          viewUrlPrefix = "/" + viewUrlPrefix;
+        }
+
+        if (!viewUrlPrefix.endsWith("/"))
+          viewUrlPrefix = viewUrlPrefix + "/";
+
+        viewUrl = new URI(jenkinsUrl + VIEW_URL_PREFIX + URLParamEncoder.encode(jenkinsViewName));
       }
       catch (URISyntaxException e) {
         throw new ProcessingException(e);
@@ -79,7 +93,7 @@ public class Main {
         out = new PrintWriter(new FileWriter(outputFile));
       }
       catch (IOException e) {
-        throw new ProcessingException("Unable to create file "+outputFileName, e);
+        throw new ProcessingException("Unable to create file " + outputFileName, e);
       }
 
       // ViewData viewData =
@@ -89,13 +103,36 @@ public class Main {
       final JenkinsReportGenerator app = (new JenkinsReportGeneratorBuilder()).buildDefaultGenerator();
       app.generateReport(viewData, out);
 
+      if (Desktop.isDesktopSupported()) {
+        try {
+          Desktop.getDesktop().open(outputFile);
+        }
+        catch (IOException e) {
+        }
+      }
       log.info("Generated report to: " + outputFile);
     }
   }
 
+  private static void printUsage() {
+    System.out.println("Program Usage");
+    System.out.println();
+    System.out.println("Available options:");
+    System.out.println("Required -D"+JENKINS_URL_PROPERTY+"=http://your-jenkins-instance.com/");
+    System.out.println();
+    System.out.println("Optional -D"+VIEW_URL_PREFIX_PROPERTY+"=/view/");
+    System.out.println("\tFor nested views you want to specify the address part before the view. Defaults to /view/");
+    System.out.println();
+    System.out.println("Optional -D"+REPORTER_NAME_PREFIX_PROPERTY+"=job-name-prefix");
+    System.out.println("\tOnly include jobs with names that start with this prefix.");
+    System.out.println();
+    System.out.println("Optional -D"+REPORTER_OUTPUT_FILE_PROPERTY+"=output-file-name");
+    System.out.println("\tSpecify output filename. By default writes to TMP folder and outputs file name");
+  }
+
   private static boolean validateArguments() {
-    if (VIEW_URL_PATTERN == null) {
-      System.out.println(String.format("Please provide your Jenkins view url pattern with -D%s", VIEW_URL_PATTERN_PROPERTY)); // NOSONAR
+    if (VIEW_URL_PREFIX == null) {
+      System.out.println(String.format("Please provide your Jenkins view url pattern with -D%s", VIEW_URL_PREFIX_PROPERTY)); // NOSONAR
       return false;
     }
 
