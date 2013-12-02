@@ -180,7 +180,8 @@ public class JenkinsViewAnalyser {
         }
 
         // these listings also list "Groups" that are not actually jobs
-        // I'll just ignore these
+        // I'll just ignore these and I happen to know they don't have the color
+        // available :)
         if (el.getElementsByTagName("color").getLength() == 0) {
           continue;
         }

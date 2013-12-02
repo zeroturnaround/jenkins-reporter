@@ -10,6 +10,12 @@
 		<ch.qos.logback-version>1.0.7</ch.qos.logback-version>
 	</properties>
 
+	<scm>
+		<connection>scm:git:git@github.com:zeroturnaround/jenkins-reporter.git</connection>
+		<url>scm:git:git@github.com:zeroturnaround/jenkins-reporter.git</url>
+		<developerConnection>scm:git:git@github.com:zeroturnaround/jenkins-reporter.git</developerConnection>
+	</scm>
+
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>
