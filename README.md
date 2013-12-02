@@ -18,6 +18,8 @@ mvn install
 java -Dreporter.jenkins.url=http://jenkins/ -jar target/jenkins-reporter-standalone.jar Jenkins-View-Name
 ```
 
+If you don't want to build the archive yourself then just check out the [releases page](https://github.com/zeroturnaround/jenkins-reporter/releases).
+
 This will generate a report and if run on a desktop will open it in your browser.
 
 ### Usage vol 2
