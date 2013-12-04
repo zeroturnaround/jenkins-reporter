@@ -34,7 +34,7 @@ import org.zeroturnaround.jenkins.reporter.util.XMLResponseHandler;
 public class JenkinsHttpClient {
   private static final Logger log = LoggerFactory.getLogger(JenkinsHttpClient.class); // NOSONAR
 
-  private final DefaultHttpClient httpClient;
+  protected final DefaultHttpClient httpClient;
   private XMLResponseHandler handler;
   private final XPath xpath;
 
