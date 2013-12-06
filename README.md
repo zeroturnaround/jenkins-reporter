@@ -22,6 +22,11 @@ If you don't want to build the archive yourself then just check out the [release
 
 This will generate a report and if run on a desktop will open it in your browser.
 
+### Advanced Usage
+```bash
+java -Dreporter.jenkins.url=https://jenkins.mycompany.com/ -Dreporter.jenkins.username=myusername -Dreporter.jenkins.api.token=mytoken -Dreporter.name.prefix=myproject_ -Dreporter.jenkins.ignore.ssl=true -Dreporter.output.file=target/report.html -jar target/jenkins-reporter-standalone.jar All
+```
+
 ### Usage vol 2
 
 Create a Jenkins job that runs this command for you and archive the results. You will always have up to date results for your most important views.
