@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.jenkins.reporter.model.JenkinsView;
 import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
+import org.zeroturnaround.jenkins.reporter.JenkinsReportGeneratorBuilder;
 
 /**
  * Main entry point
@@ -27,7 +28,7 @@ public class Main {
   private static final String JENKINS_API_TOKEN_PROPERTY = "reporter.jenkins.api.token";
   private static final String REPORTER_NAME_PREFIX_PROPERTY = "reporter.name.prefix";
   private static final String REPORTER_OUTPUT_FILE_PROPERTY = "reporter.output.file";
-  private static final String JENKINS_IGNORE_SSL_PROPERTY = "reporter.jenkins.ignoreSsl";
+  private static final String JENKINS_IGNORE_SSL_PROPERTY = "reporter.jenkins.ignore.ssl";
 
   /**
    * The HTTP url of your Jenkins instances. For example http://jenkins/
@@ -106,12 +107,7 @@ public class Main {
       // ViewData viewData =
       JenkinsViewAnalyser jHelper;
 
-      if (JENKINS_IGNORE_SSL && viewUrl.getScheme().equalsIgnoreCase("https")) {
-        jHelper = (new JenkinsHelperBuilder()).createDefault(JENKINS_USERNAME, JENKINS_API_TOKEN, viewUrl.getPort(), true);
-      }
-      else {
-        jHelper = (new JenkinsHelperBuilder()).createDefault(JENKINS_USERNAME, JENKINS_API_TOKEN);
-      }
+      jHelper = (new JenkinsHelperBuilder()).createDefault(viewUrl, JENKINS_USERNAME, JENKINS_API_TOKEN, JENKINS_IGNORE_SSL);
 
       JenkinsView viewData = jHelper.getViewData(viewUrl);
 

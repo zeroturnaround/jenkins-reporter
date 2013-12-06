@@ -1,7 +1,7 @@
 package org.zeroturnaround.jenkins.reporter;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.net.URI;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -12,11 +12,7 @@ import org.xml.sax.SAXException;
 
 public class JenkinsHelperBuilder {
 
-  public JenkinsViewAnalyser createDefault(final String userName, final String apiToken) {
-    return createDefault(userName, apiToken, null, false);
-  }
-
-  public JenkinsViewAnalyser createDefault(final String userName, final String apiToken, final Integer sslPort, final boolean ignoreSslCertificate) {
+  public JenkinsViewAnalyser createDefault(URI viewUrl, final String userName, final String apiToken, final boolean ignoreSslCertificate) {
     final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     SAXParser saxParser;
     try {
@@ -29,27 +25,18 @@ public class JenkinsHelperBuilder {
       throw new ProcessingException(e);
     }
 
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-    DocumentBuilder builder;
-    try {
-      builder = factory.newDocumentBuilder();
-    }
-    catch (ParserConfigurationException e) {
-      throw new ProcessingException(e);
-    }
     final XPathFactory xPathfactory = XPathFactory.newInstance();
     XPath xpath = xPathfactory.newXPath();
 
     JenkinsHttpClient httpClient;
 
-    if (ignoreSslCertificate && sslPort != null) {
-        httpClient = new JenkinsIgnoreSslClient(userName, apiToken, sslPort);
+    if ("https".equalsIgnoreCase(viewUrl.getScheme())) {
+      httpClient = new JenkinsIgnoreSslClient(userName, apiToken, viewUrl.getPort());
     }
     else {
-        httpClient = new JenkinsHttpClient(userName, apiToken);
+      httpClient = new JenkinsHttpClient(userName, apiToken);
     }
 
-    return new JenkinsViewAnalyser(builder, xpath, saxParser, httpClient);
+    return new JenkinsViewAnalyser(xpath, saxParser, httpClient);
   }
 }
