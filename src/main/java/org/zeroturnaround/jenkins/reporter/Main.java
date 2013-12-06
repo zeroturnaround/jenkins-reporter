@@ -162,6 +162,9 @@ public class Main {
     System.out.println();
     System.out.println("Optional -D" + JENKINS_API_TOKEN_PROPERTY + "=jenkins-api-token");
     System.out.println("\tSpecify the api token of the username of the Jenkins instance.");
+    System.out.println();
+    System.out.println("Optional -D" + JENKINS_IGNORE_SSL_PROPERTY + "=true");
+    System.out.println("\tIgnore hostname certification matching the IP.");
   }
 
   private static boolean validateArguments() {
