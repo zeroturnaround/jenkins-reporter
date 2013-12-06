@@ -89,36 +89,39 @@ public class Main {
 
       // lets generate a output filename if none provided
       String outputFilePath = OUTPUT_FILE_NAME;
-      String outputFileName;
-      File outputDir;
-      if (outputFilePath == null) {
-        final SimpleDateFormat sdf = new SimpleDateFormat("'jenkins-report-'yyyy-MM-dd_HH.mm.ss");
-        outputFileName = jenkinsViewName + "-" + sdf.format(new Date()) + "-";
-        outputFilePath = outputFileName;
-        outputDir = null;
+      final File outputFile;
+
+      try {
+          if (outputFilePath == null) {
+            final SimpleDateFormat sdf = new SimpleDateFormat("'jenkins-report-'yyyy-MM-dd_HH.mm.ss");
+            outputFilePath = jenkinsViewName + "-" + sdf.format(new Date()) + "-";
+            outputFile = File.createTempFile(outputFilePath, ".html");
+          }
+          else {
+            File file = new File(outputFilePath);
+            File outputDir = file.getParentFile();
+            try {
+              FileUtils.forceMkdir(outputDir);
+            }
+            catch (IOException e) {
+              throw new ProcessingException("Could not create directory " + outputDir, e);
+            }
+            log.debug("Created directory {}", outputDir);
+            outputFile = new File(outputFilePath);
+          }
       }
-      else {
-        File file = new File(outputFilePath);
-        outputFileName = file.getName();
-        outputDir = file.getParentFile();
-        try {
-          FileUtils.forceMkdir(outputDir);
-        }
-        catch (IOException e) {
-          throw new ProcessingException("Could not create directory " + outputDir, e);
-        }
-        log.debug("Created directory {}", outputDir);
+      catch (IOException e) {
+          throw new ProcessingException("Unable to create file " + outputFilePath, e);
       }
+
       log.debug("Using view URL {} and generating output to {}", viewUrl, outputFilePath);
 
-      File outputFile;
       PrintWriter out;
       try {
-        outputFile = File.createTempFile(outputFileName, ".html", outputDir);
         out = new PrintWriter(new FileWriter(outputFile));
       }
       catch (IOException e) {
-        throw new ProcessingException("Unable to create file " + outputFilePath, e);
+        throw new ProcessingException("Unable to write into the file " + outputFile.getAbsolutePath(), e);
       }
 
       // ViewData viewData =
