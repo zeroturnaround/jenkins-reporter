@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.jenkins.reporter.model.JenkinsView;
@@ -87,21 +88,37 @@ public class Main {
       }
 
       // lets generate a output filename if none provided
-      String outputFileName = OUTPUT_FILE_NAME;
-      if (outputFileName == null) {
+      String outputFilePath = OUTPUT_FILE_NAME;
+      String outputFileName;
+      File outputDir;
+      if (outputFilePath == null) {
         final SimpleDateFormat sdf = new SimpleDateFormat("'jenkins-report-'yyyy-MM-dd_HH.mm.ss");
         outputFileName = jenkinsViewName + "-" + sdf.format(new Date()) + "-";
+        outputFilePath = outputFileName;
+        outputDir = null;
       }
-      log.debug("Using view URL {} and generating output to {}", viewUrl, outputFileName);
+      else {
+        File file = new File(outputFilePath);
+        outputFileName = file.getName();
+        outputDir = file.getParentFile();
+        try {
+          FileUtils.forceMkdir(outputDir);
+        }
+        catch (IOException e) {
+          throw new ProcessingException("Could not create directory " + outputDir, e);
+        }
+        log.debug("Created directory {}", outputDir);
+      }
+      log.debug("Using view URL {} and generating output to {}", viewUrl, outputFilePath);
 
       File outputFile;
       PrintWriter out;
       try {
-        outputFile = File.createTempFile(outputFileName, ".html");
+        outputFile = File.createTempFile(outputFileName, ".html", outputDir);
         out = new PrintWriter(new FileWriter(outputFile));
       }
       catch (IOException e) {
-        throw new ProcessingException("Unable to create file " + outputFileName, e);
+        throw new ProcessingException("Unable to create file " + outputFilePath, e);
       }
 
       // ViewData viewData =
