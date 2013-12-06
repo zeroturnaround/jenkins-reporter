@@ -30,7 +30,7 @@ public class JenkinsHelperBuilder {
 
     JenkinsHttpClient httpClient;
 
-    if ("https".equalsIgnoreCase(viewUrl.getScheme())) {
+    if (ignoreSslCertificate && "https".equalsIgnoreCase(viewUrl.getScheme())) {
       httpClient = new JenkinsIgnoreSslClient(userName, apiToken, viewUrl.getPort());
     }
     else {
