@@ -11,7 +11,12 @@ import javax.xml.xpath.XPathFactory;
 import org.xml.sax.SAXException;
 
 public class JenkinsHelperBuilder {
+
   public JenkinsViewAnalyser createDefault(final String userName, final String apiToken) {
+    return createDefault(userName, apiToken, null, false);
+  }
+
+  public JenkinsViewAnalyser createDefault(final String userName, final String apiToken, final Integer sslPort, final boolean ignoreSslCertificate) {
     final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     SAXParser saxParser;
     try {
@@ -36,6 +41,15 @@ public class JenkinsHelperBuilder {
     final XPathFactory xPathfactory = XPathFactory.newInstance();
     XPath xpath = xPathfactory.newXPath();
 
-    return new JenkinsViewAnalyser(builder, xpath, saxParser, new JenkinsHttpClient(userName, apiToken));
+    JenkinsHttpClient httpClient;
+
+    if (ignoreSslCertificate && sslPort != null) {
+        httpClient = new JenkinsIgnoreSslClient(userName, apiToken, sslPort);
+    }
+    else {
+        httpClient = new JenkinsHttpClient(userName, apiToken);
+    }
+
+    return new JenkinsViewAnalyser(builder, xpath, saxParser, httpClient);
   }
 }

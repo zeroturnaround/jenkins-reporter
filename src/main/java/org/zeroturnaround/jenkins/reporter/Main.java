@@ -27,6 +27,7 @@ public class Main {
   private static final String JENKINS_API_TOKEN_PROPERTY = "reporter.jenkins.api.token";
   private static final String REPORTER_NAME_PREFIX_PROPERTY = "reporter.name.prefix";
   private static final String REPORTER_OUTPUT_FILE_PROPERTY = "reporter.output.file";
+  private static final String JENKINS_IGNORE_SSL_PROPERTY = "reporter.jenkins.ignoreSsl";
 
   /**
    * The HTTP url of your Jenkins instances. For example http://jenkins/
@@ -45,6 +46,7 @@ public class Main {
 
   public static final String JENKINS_USERNAME = System.getProperty(JENKINS_USERNAME_PROPERTY);
   public static final String JENKINS_API_TOKEN = System.getProperty(JENKINS_API_TOKEN_PROPERTY);
+  public static final boolean JENKINS_IGNORE_SSL = Boolean.getBoolean(JENKINS_IGNORE_SSL_PROPERTY);
 
   public static final void main(String[] args) {
     if (args.length == 0) {
@@ -102,7 +104,15 @@ public class Main {
       }
 
       // ViewData viewData =
-      JenkinsViewAnalyser jHelper = (new JenkinsHelperBuilder()).createDefault(JENKINS_USERNAME, JENKINS_API_TOKEN);
+      JenkinsViewAnalyser jHelper;
+
+      if (JENKINS_IGNORE_SSL && viewUrl.getScheme().equalsIgnoreCase("https")) {
+        jHelper = (new JenkinsHelperBuilder()).createDefault(JENKINS_USERNAME, JENKINS_API_TOKEN, viewUrl.getPort(), true);
+      }
+      else {
+        jHelper = (new JenkinsHelperBuilder()).createDefault(JENKINS_USERNAME, JENKINS_API_TOKEN);
+      }
+
       JenkinsView viewData = jHelper.getViewData(viewUrl);
 
       final JenkinsReportGenerator app = (new JenkinsReportGeneratorBuilder()).buildDefaultGenerator();
