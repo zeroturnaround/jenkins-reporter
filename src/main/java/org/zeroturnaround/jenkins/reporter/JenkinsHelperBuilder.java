@@ -37,7 +37,7 @@ public class JenkinsHelperBuilder {
         port = 443;
       }
 
-      httpClient = new JenkinsIgnoreSslClient(userName, apiToken, viewUrl.getPort());
+      httpClient = new JenkinsIgnoreSslClient(userName, apiToken, port);
     }
     else {
       httpClient = new JenkinsHttpClient(userName, apiToken);
