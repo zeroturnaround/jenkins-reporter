@@ -36,7 +36,6 @@ public class JenkinsHttpClient {
 
   private final DefaultHttpClient httpClient;
   private XMLResponseHandler handler;
-  private final XPath xpath;
 
   HttpRequestInterceptor preemptiveAuth = new HttpRequestInterceptor() {
     public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
@@ -63,7 +62,6 @@ public class JenkinsHttpClient {
       throw new ProcessingException(e);
     }
     handler = new XMLResponseHandler(builder);
-    xpath = XPathFactory.newInstance().newXPath();
 
     httpClient = new DefaultHttpClient();
     if (username != null) {

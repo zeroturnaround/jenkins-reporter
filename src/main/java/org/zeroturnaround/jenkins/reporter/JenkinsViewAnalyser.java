@@ -11,14 +11,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.SAXParser;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.http.client.utils.HttpClientUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -35,7 +33,6 @@ import org.zeroturnaround.jenkins.reporter.model.TestReport;
 
 public class JenkinsViewAnalyser {
   private static final Logger log = LoggerFactory.getLogger(JenkinsViewAnalyser.class); // NOSONAR
-  private DocumentBuilder builder;
   private final XPath xpath;
   private final SAXParser saxParser;
   private final JenkinsHttpClient jhc;
@@ -44,8 +41,7 @@ public class JenkinsViewAnalyser {
   private static final int SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60;
   private static final int MILLISECONDS_IN_SECOND = 1000;
 
-  public JenkinsViewAnalyser(DocumentBuilder builder, XPath xpath, SAXParser saxParser, JenkinsHttpClient jhc) {
-    this.builder = builder;
+  public JenkinsViewAnalyser(XPath xpath, SAXParser saxParser, JenkinsHttpClient jhc) {
     this.xpath = xpath;
     this.saxParser = saxParser;
     this.jhc = jhc;
