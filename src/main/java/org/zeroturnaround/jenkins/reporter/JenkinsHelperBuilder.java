@@ -31,6 +31,12 @@ public class JenkinsHelperBuilder {
     JenkinsHttpClient httpClient;
 
     if (ignoreSslCertificate && "https".equalsIgnoreCase(viewUrl.getScheme())) {
+      // it seems that 443 is denoted by -1 when coming from uri
+      int port = viewUrl.getPort();
+      if (port == -1) {
+        port = 443;
+      }
+
       httpClient = new JenkinsIgnoreSslClient(userName, apiToken, viewUrl.getPort());
     }
     else {
