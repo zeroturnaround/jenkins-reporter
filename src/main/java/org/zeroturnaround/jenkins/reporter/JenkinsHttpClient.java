@@ -77,7 +77,7 @@ public class JenkinsHttpClient {
     }
     catch (HttpResponseException e) {
       if (e.getStatusCode() == 404)
-        throw new DocumentNotFoundException(e);
+        throw new DocumentNotFoundException(uri, e);
       else
         throw new ProcessingException(e);
     }

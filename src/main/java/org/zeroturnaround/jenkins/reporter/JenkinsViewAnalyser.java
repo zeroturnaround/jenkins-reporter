@@ -111,11 +111,14 @@ public class JenkinsViewAnalyser {
 
     for (final Iterator<Job> iter = jobs.iterator(); iter.hasNext();) {
       final Job job = iter.next();
-      job.setLastCompletedBuild(getLastCompletedBuild(job));
-      job.setChildren(readChildrenJobs(job));
-
-      if (job.getLastCompletedBuild() == null && job.getChildren().isEmpty()) {
-        // job has no last completed build nor children, ignore it
+      try {
+        job.setLastCompletedBuild(getLastCompletedBuild(job));
+        job.setChildren(readChildrenJobs(job));
+      }
+      // sometimes there is no last completed build
+      // we can ignore the job
+      catch (DocumentNotFoundException e) {
+        job.setLastCompletedBuild(null);
         iter.remove();
       }
     }
