@@ -188,15 +188,11 @@
 				, <b>Started:</b> $dateTool.format('HH:mm dd.MM.yyyy', $job.lastCompletedBuild.timestamp), <b>Duration:</b> $job.lastCompletedBuild.duration)
 				
 				#if($job.lastCompletedBuild.testReport)
-					#if(!$noFailedTests)
 						, failed
 						<a href="${job.url}${job.lastCompletedBuild.id}/console" target="_blank">${job.lastCompletedBuild.testReport.failCount}</a>
 						tests of ${job.lastCompletedBuild.testReport.totalCount}.
 						Failure ratio $numberTool.format("#0.0'%'", $job.lastCompletedBuild.testReport.failureRate).
 						( <a href="${job.url}${job.lastCompletedBuild.id}/testReport" target="_blank">see the test report</a> ):
-					#{else}
-						, no tests failed.
-					#{end}
 				#{end}
 			</p>
 			
@@ -213,15 +209,11 @@
 								, <b>Duration:</b> $childJob.lastCompletedBuild.duration)
 								
 								#if($childJob.lastCompletedBuild.testReport)
-									#if($childJob.lastCompletedBuild.testReport.failCount > 0)
 										, failed
 										<a href="${childJob.url}${childJob.lastCompletedBuild.id}/console" target="_blank">${childJob.lastCompletedBuild.testReport.failCount}</a>
 										tests of ${childJob.lastCompletedBuild.testReport.totalCount}.
 										Failure ratio $numberTool.format("#0.0'%'", $childJob.lastCompletedBuild.testReport.failureRate).
 										( <a href="${childJob.url}${childJob.lastCompletedBuild.id}/testReport" target="_blank">see the test report</a> ):
-									#{else}
-										, no tests failed.
-									#{end}
 								#{end}
 								
 								<ul class="testResults job_${job.id}_testResults childJob_${childJob.id}_testResults" style="display: #if($hideTestReports)none#{else}block#{end};">
