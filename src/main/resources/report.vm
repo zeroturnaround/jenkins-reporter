@@ -153,12 +153,15 @@
 <h1><a href="${view.url}">${view.name}</a></h1>
 
 #if($jobs.isEmpty())
-	<p>Congratulations, there are no failed tests!</p>
+	<p>No jobs to report.</p>
 #else
-	<p>My condolences, there are $failedJobs.size() failed jobs (of $view.jobsTotal total jobs) with $view.failCount failed tests (of $view.testsTotal total tests). Failure ratio $numberTool.format("#0.0'%'", $view.failureRate).</p>
-	
-	<p><small><a href="javascript:expandAll()">expand all</a> | <a href="javascript:collapseAll()">collapse all</a></small></p>
-	
+    #if($failedJobs.isEmpty())
+        <p>Good news, everyone! None of $view.testsTotal tests have failed from $view.jobsTotal jobs.</p>
+    #else
+	    <p>My condolences, there are $failedJobs.size() failed jobs (of $view.jobsTotal total jobs) with $view.failCount failed tests (of $view.testsTotal total tests). Failure ratio $numberTool.format("#0.0'%'", $view.failureRate).</p>
+        <p><small><a href="javascript:expandAll()">expand all</a> | <a href="javascript:collapseAll()">collapse all</a></small></p>
+    #end
+
 	#set ($i = 1)
 	#set($firstJobStartDayOfYear = -1)
 	
