@@ -177,8 +177,8 @@
 		#{end}
 		#set ($hideTestReports = $job.lastCompletedBuild.testReport && $job.lastCompletedBuild.testReport.testCases.size() > 30)
 		#set ($noFailedTests = !$job.lastCompletedBuild.testReport || $job.lastCompletedBuild.testReport.failCount == 0)
-		#set ($allowToggle = $job.lastCompletedBuild.testReport && $job.lastCompletedBuild.testReport.failCount > 0)
-		#set ($collapsed = ($job.lastCompletedBuild.testReport && $job.lastCompletedBuild.testReport.failCount > 30) || $noFailedTests)
+		#set ($allowToggle = $job.lastCompletedBuild.testReport && $job.failCount > 0)
+		#set ($collapsed = ($job.lastCompletedBuild.testReport && $job.failCount > 30) || $noFailedTests)
 		
 		<span id="job_${job.id}">
 			<p>
@@ -192,9 +192,9 @@
 				
 				#if($job.lastCompletedBuild.testReport)
 						, failed
-						<a href="${job.url}${job.lastCompletedBuild.id}/console" target="_blank">${job.lastCompletedBuild.testReport.failCount}</a>
-						tests of ${job.lastCompletedBuild.testReport.totalCount}.
-						Failure ratio $numberTool.format("#0.0'%'", $job.lastCompletedBuild.testReport.failureRate).
+						<a href="${job.url}${job.lastCompletedBuild.id}/console" target="_blank">${job.failCount}</a>
+						tests of ${job.totalCount}.
+						Failure ratio $numberTool.format("#0.0'%'", $job.failureRate).
 						( <a href="${job.url}${job.lastCompletedBuild.id}/testReport" target="_blank">see the test report</a> ):
 				#{end}
 			</p>
