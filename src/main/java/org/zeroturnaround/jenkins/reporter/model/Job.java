@@ -16,7 +16,6 @@
 package org.zeroturnaround.jenkins.reporter.model;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,33 +24,17 @@ import org.w3c.dom.Document;
 import com.google.common.base.Predicate;
 
 public class Job {
-  public static class BadJobPredicate extends JobColorPredicate {
-    public BadJobPredicate() {
-      super("red", "red_anime", "aborted", "aborted_anime", "yellow", "yellow_anime");
-    }
-  }
-
-  public static class GoodJobPredicate extends JobColorPredicate {
-    public GoodJobPredicate() {
-      super("blue", "blue_anime");
-    }
-  }
-
-  public static class JobColorPredicate implements Predicate<Job> {
-
-    private final Collection<String> colors;
-
-    public JobColorPredicate(Collection<String> colors) {
-      this.colors = colors;
-    }
-
-    public JobColorPredicate(String... colors) {
-      this.colors = Arrays.asList(colors);
-    }
-
+  public static class BadJobPredicate implements Predicate<Job>{
     @Override
-    public boolean apply(Job input) {
-      return colors.contains(input.getColor());
+    public boolean apply(Job job) {
+      return job.getFailCount() > 0;
+    }
+  }
+
+  public static class GoodJobPredicate implements Predicate<Job>{
+    @Override
+    public boolean apply(Job job) {
+      return job.getFailCount() == 0;
     }
   }
 
@@ -78,6 +61,52 @@ public class Job {
 
   public Collection<Job> getChildren() {
     return children;
+  }
+
+  public int getFailCount() {
+    if (isMatrix()) {
+      int failedCount = 0;
+      for (Job child : getChildren()) {
+        failedCount += child.getFailCount();
+      }
+      return failedCount;
+    }
+    else {
+      TestReport report = getLastReport();
+      return report == null ? 0 : report.getFailCount();
+    }
+  }
+
+  public int getPassCount() {
+    if (isMatrix()) {
+      int passCount = 0;
+      for (Job child : getChildren()) {
+        passCount += child.getPassCount();
+      }
+      return passCount;
+    }
+    else {
+      TestReport report = getLastReport();
+      return report == null ? 0 : report.getTotalCount();
+    }
+  }
+
+  public int getTotalCount() {
+    if (isMatrix()) {
+      int totalCount = 0;
+      for (Job child : getChildren()) {
+        totalCount += child.getTotalCount();
+      }
+      return totalCount;
+    }
+    else {
+      TestReport report = getLastReport();
+      return report == null ? 0 : report.getTotalCount();
+    }
+  }
+
+  public double getFailureRate() {
+    return (double)getFailCount()/getTotalCount();
   }
 
   public String getColor() {
@@ -122,5 +151,13 @@ public class Job {
 
   public void setUrl(URI url) {
     this.url = url;
+  }
+
+  private TestReport getLastReport() {
+    Build build = getLastCompletedBuild();
+    if (build == null)
+      return null;
+
+    return build.getTestReport();
   }
 }

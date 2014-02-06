@@ -28,14 +28,16 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class JenkinsView {
-  private int failCount;
   private Collection<Job> jobs = newArrayList();
   private int jobsTotal;
   private String name;
-  private int testsTotal;
   private URI url;
 
   public int getFailCount() {
+    int failCount = 0;
+    for (Job job : jobs) {
+      failCount += job.getFailCount();
+    }
     return failCount;
   }
 
@@ -69,28 +71,20 @@ public class JenkinsView {
   }
 
   public int getTestsTotal() {
-    return testsTotal;
+    int totalCount = 0;
+    for (Job job : jobs) {
+      totalCount += job.getTotalCount();
+    }
+    return totalCount;
   }
 
   public URI getUrl() {
     return url;
   }
 
-  public void setFailCount(int failCount) {
-    this.failCount = failCount;
-  }
 
   public void setJobs(Collection<Job> jobs) {
     this.jobs = jobs;
-
-    if (jobs != null) {
-      for (final Job job : jobs) {
-        if (job.getLastCompletedBuild() != null && job.getLastCompletedBuild().getTestReport() != null) {
-          failCount += job.getLastCompletedBuild().getTestReport().getFailCount();
-          testsTotal += job.getLastCompletedBuild().getTestReport().getTotalCount();
-        }
-      }
-    }
   }
 
   public void setJobsTotal(int jobsTotal) {
@@ -99,10 +93,6 @@ public class JenkinsView {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void setTestsTotal(int testsTotal) {
-    this.testsTotal = testsTotal;
   }
 
   public void setUrl(URI url) {
