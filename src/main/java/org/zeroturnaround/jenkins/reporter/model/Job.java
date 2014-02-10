@@ -72,7 +72,7 @@ public class Job {
   }
 
   public boolean isGrey() {
-    return "aborted".equals(color) || "aborted".equals(color);
+    return "aborted".equals(color) || "aborted_anime".equals(color);
   }
 
   public boolean isYellow() {
