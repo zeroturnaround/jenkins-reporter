@@ -26,6 +26,7 @@ public class Build {
   private Date timestamp;
   private URI url;
   private int dayOfYear;
+  private String builtOn;
 
   public String getDuration() {
     return duration;
@@ -81,5 +82,13 @@ public class Build {
 
   public int getDayOfYear() {
     return dayOfYear;
+  }
+
+  public String getBuiltOn() {
+    return builtOn;
+  }
+
+  public void setBuiltOn(String builtOn) {
+    this.builtOn = builtOn;
   }
 }

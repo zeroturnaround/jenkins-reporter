@@ -206,13 +206,11 @@ public class JenkinsViewAnalyser {
   }
 
   private Build getLastCompletedBuild(Job job) {
-    Build build = null;
-
     log.debug("Fetching last completed build info for job {}", job.getName());
-    final String uri = job.getUrl() + "lastCompletedBuild/api/xml?tree=number,url,timestamp,duration,result";
+    final String uri = job.getUrl() + "lastCompletedBuild/api/xml?tree=number,url,timestamp,duration,result,builtOn";
     final Document doc = jhc.fetchAsXMLDocument(uri);
 
-    build = new Build();
+    Build build = new Build();
     build.setId(Integer.parseInt(doc.getElementsByTagName("number").item(0).getTextContent()));
     build.setResult(doc.getElementsByTagName("result").item(0).getTextContent());
     try {
@@ -240,6 +238,9 @@ public class JenkinsViewAnalyser {
     final long durationSeconds = Long.parseLong(doc.getElementsByTagName("duration").item(0).getTextContent()) / MILLISECONDS_IN_SECOND;
     build.setDuration(String.format("%d:%02d:%02d", durationSeconds / SECONDS_IN_HOUR, durationSeconds % SECONDS_IN_HOUR / SECONDS_IN_MINUTE, durationSeconds % SECONDS_IN_MINUTE));
 
+    String builtOn = doc.getElementsByTagName("builtOn").item(0).getTextContent();
+    build.setBuiltOn(builtOn.isEmpty() ? "master" : builtOn);
+    
     return build;
   }
 

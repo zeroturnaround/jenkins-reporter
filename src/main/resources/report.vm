@@ -187,8 +187,10 @@
 				<b>${job.lastCompletedBuild.result}</b> 
 				
 				<a href="${job.url}" target="_blank">${job.name}</a> 
-				(#<a href="${job.lastCompletedBuild.url}" target="_blank">${job.lastCompletedBuild.id}</a>
-				, <b>Started:</b> $dateTool.format('HH:mm dd.MM.yyyy', $job.lastCompletedBuild.timestamp), <b>Duration:</b> $job.lastCompletedBuild.duration)
+				(#<a href="${job.lastCompletedBuild.url}" target="_blank">${job.lastCompletedBuild.id}</a>,
+				<b>Started:</b> $dateTool.format('HH:mm dd.MM.yyyy', $job.lastCompletedBuild.timestamp),
+				<b>Duration:</b> $job.lastCompletedBuild.duration,
+				<b>Built on:</b> $job.lastCompletedBuild.builtOn)
 				
 				#if($job.lastCompletedBuild.testReport)
 						, failed
@@ -208,8 +210,9 @@
 								
 								<a href="${childJob.url}" target="_blank">${childJob.name}</a>
 								 
-								(#<a href="${childJob.lastCompletedBuild.url}" target="_blank">${childJob.lastCompletedBuild.id}</a>
-								, <b>Duration:</b> $childJob.lastCompletedBuild.duration)
+								(#<a href="${childJob.lastCompletedBuild.url}" target="_blank">${childJob.lastCompletedBuild.id}</a>,
+								<b>Duration:</b> $childJob.lastCompletedBuild.duration,
+								<b>Built on:</b> $childJob.lastCompletedBuild.builtOn)
 								
 								#if($childJob.lastCompletedBuild.testReport)
 										, failed
@@ -316,8 +319,10 @@
         #{end}
 		<p>
 			<a href="${job.url}" target="_blank">${job.name}</a> 
-			(#<a href="${job.lastCompletedBuild.url}" target="_blank">${job.lastCompletedBuild.id}</a>
-			, <b>Started:</b> $dateTool.format('HH:mm dd.MM.yyyy', $job.lastCompletedBuild.timestamp), <b>Duration:</b> $job.lastCompletedBuild.duration)
+			(#<a href="${job.lastCompletedBuild.url}" target="_blank">${job.lastCompletedBuild.id}</a>,
+			<b>Started:</b> $dateTool.format('HH:mm dd.MM.yyyy', $job.lastCompletedBuild.timestamp),
+			<b>Duration:</b> $job.lastCompletedBuild.duration,
+			<b>Built on:</b> $job.lastCompletedBuild.builtOn)
 			#if($job.lastCompletedBuild.testReport)
 				, passed ${job.lastCompletedBuild.testReport.totalCount} tests.
 			#end
