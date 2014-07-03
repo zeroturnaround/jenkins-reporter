@@ -209,7 +209,7 @@
 			#if($job.matrix)
 				<ul class="childJob job_${job.id}_testResults">
 					#foreach ($childJob in $job.children)
-						#if($childJob.lastCompletedBuild.result == "FAILURE")
+						#if($childJob.lastCompletedBuild.result == "FAILURE" || $childJob.lastCompletedBuild.result == "ABORTED")
 							<li>
 								<span id="childJob_${childJob.id}_toggleButton" class="job-row-toggle-icon #if($allowToggle)clickable-icon expanded-icon#{else}collapsed-icon#{end}" #if($allowToggle)onclick="toggleVisibilityOfChildTestResults('${childJob.id}')"#{end}></span>
 								
