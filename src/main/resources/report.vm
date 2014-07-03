@@ -147,10 +147,15 @@
 	ul.childJob {
 		list-style-type: none;
 	}
+	
+	.muted {
+		color: gray;
+	}
 </style>
 </head>
 <body>
 <h1><a href="${view.url}">${view.name}</a></h1>
+<small class="muted">Generated at $dateTool.format('HH:mm dd.MM.yyyy', $startTime).</small>
 
 #if($jobs.isEmpty())
 	<p>No jobs to report.</p>

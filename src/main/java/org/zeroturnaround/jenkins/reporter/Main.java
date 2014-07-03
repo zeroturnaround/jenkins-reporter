@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.jenkins.reporter.model.JenkinsView;
 import org.zeroturnaround.jenkins.reporter.util.URLParamEncoder;
-import org.zeroturnaround.jenkins.reporter.JenkinsReportGeneratorBuilder;
+import com.google.common.base.Splitter;
 
 /**
  * Main entry point
@@ -68,20 +68,24 @@ public class Main {
     String jenkinsUrl = JENKINS_URL;
     if (JENKINS_URL.endsWith("/"))
       jenkinsUrl = JENKINS_URL.substring(0, JENKINS_URL.length() - 1);
+    
+    String viewUrlPrefix = VIEW_URL_PREFIX;
+    if (!viewUrlPrefix.startsWith("/"))
+      viewUrlPrefix = "/" + viewUrlPrefix;
+    if (!viewUrlPrefix.endsWith("/"))
+      viewUrlPrefix = viewUrlPrefix + "/";
 
-    // Lets generate a report for all the view specified
-    for (final String jenkinsViewName : args) {
+    Date startTime = new Date();
+    // Lets generate a report for all the views specified
+    for (String viewPath : args) {
       URI viewUrl;
       try {
-        String viewUrlPrefix = VIEW_URL_PREFIX;
-        if (!viewUrlPrefix.startsWith("/")) {
-          viewUrlPrefix = "/" + viewUrlPrefix;
-        }
-
-        if (!viewUrlPrefix.endsWith("/"))
-          viewUrlPrefix = viewUrlPrefix + "/";
-
-        viewUrl = new URI(jenkinsUrl + VIEW_URL_PREFIX + URLParamEncoder.encode(jenkinsViewName));
+        Iterable<String> viewNames = Splitter.on('/').split(viewPath);
+        StringBuilder urlBuilder = new StringBuilder(jenkinsUrl);
+        for (String viewName : viewNames)
+          urlBuilder.append(viewUrlPrefix).append(URLParamEncoder.encode(viewName));
+        
+        viewUrl = new URI(urlBuilder.toString());
       }
       catch (URISyntaxException e) {
         throw new ProcessingException(e);
@@ -93,8 +97,8 @@ public class Main {
 
       try {
           if (outputFilePath == null) {
-            final SimpleDateFormat sdf = new SimpleDateFormat("'jenkins-report-'yyyy-MM-dd_HH.mm.ss");
-            outputFilePath = jenkinsViewName + "-" + sdf.format(new Date()) + "-";
+            final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+            outputFilePath = viewPath.replace("/", "-") + "-jenkins-report-" + sdf.format(startTime) + "-";
             outputFile = File.createTempFile(outputFilePath, ".html");
           }
           else {
@@ -132,7 +136,7 @@ public class Main {
       JenkinsView viewData = jHelper.getViewData(viewUrl);
 
       final JenkinsReportGenerator app = (new JenkinsReportGeneratorBuilder()).buildDefaultGenerator();
-      app.generateReport(viewData, out);
+      app.generateReport(viewData, out, startTime);
 
       if (Desktop.isDesktopSupported()) {
         try {

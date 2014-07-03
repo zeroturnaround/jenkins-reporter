@@ -19,11 +19,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -40,7 +36,7 @@ public class JenkinsReportGenerator {
     this.template = template;
   }
 
-  public void generateReport(JenkinsView viewData, PrintWriter out) {
+  public void generateReport(JenkinsView viewData, PrintWriter out, Date startTime) {
     final List<Job> failedJobs = newArrayList();
     failedJobs.addAll(viewData.getFailedJobs());
 
@@ -54,6 +50,7 @@ public class JenkinsReportGenerator {
     Collections.sort(passedJobs, new JobByTimestampComparator());
 
     final VelocityContext context = new VelocityContext();
+    context.put("startTime", startTime);
 
     final DateTool dateTool = new DateTool();
     final Map<String, String> config = new HashMap<String, String>();
