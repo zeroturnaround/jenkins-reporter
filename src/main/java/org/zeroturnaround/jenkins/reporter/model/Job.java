@@ -27,7 +27,7 @@ public class Job {
   public static class BadJobPredicate implements Predicate<Job>{
     @Override
     public boolean apply(Job job) {
-      return !(job.getFailCount() == 0 && job.isGreen());
+      return job.getFailCount() != 0 || job.isRed() || job.isYellow();
     }
   }
 
