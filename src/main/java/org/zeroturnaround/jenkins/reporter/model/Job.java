@@ -27,14 +27,14 @@ public class Job {
   public static class BadJobPredicate implements Predicate<Job>{
     @Override
     public boolean apply(Job job) {
-      return job.getFailCount() != 0 || job.isRed() || job.isYellow();
+      return job.getFailCount() != 0 || job.isRed() || job.isYellow() || job.isAborted();
     }
   }
 
   public static class GoodJobPredicate implements Predicate<Job>{
     @Override
     public boolean apply(Job job) {
-      return job.getFailCount() == 0 && job.isGreen();
+      return job.getFailCount() == 0 && (job.isGreen() || job.isDisabled());
     }
   }
 
@@ -71,12 +71,16 @@ public class Job {
     return "blue".equals(color) || "blue_anime".equals(color);
   }
 
-  public boolean isGrey() {
+  public boolean isAborted() {
     return "aborted".equals(color) || "aborted_anime".equals(color);
   }
 
   public boolean isYellow() {
     return "yellow".equals(color) || "yellow_anime".equals(color);
+  }
+  
+  public boolean isDisabled() {
+    return "disabled".equals(color);
   }
 
 
