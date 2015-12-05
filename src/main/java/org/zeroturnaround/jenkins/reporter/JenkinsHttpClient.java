@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
@@ -61,7 +62,9 @@ public class JenkinsHttpClient {
     }
     handler = new XMLResponseHandler(builder);
 
-    httpClient = new DefaultHttpClient();
+    PoolingClientConnectionManager manager = new PoolingClientConnectionManager();
+    manager.setDefaultMaxPerRoute(20);
+    httpClient = new DefaultHttpClient(manager);
     if (username != null) {
       Credentials credentials = new UsernamePasswordCredentials(username, authToken);
       httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
